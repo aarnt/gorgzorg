@@ -39,6 +39,7 @@ int main(int argc, char *argv[])
   if (argList->contains(QLatin1String("-z")))
   {
     aux = argList->getSwitchArg(QLatin1String("-z"));
+
     if (!aux.isEmpty() &&
         !aux.startsWith(QLatin1String("10.0")) &&
         !aux.startsWith(QLatin1String("127.0.0")) &&
@@ -120,6 +121,7 @@ int main(int argc, char *argv[])
     if (!target.isEmpty() && !pathToGorg.isEmpty())
     {
       gz.connectAndSend(target, pathToGorg);
+      qout << Qt::endl;
     }
   }
 

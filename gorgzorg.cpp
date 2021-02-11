@@ -191,7 +191,7 @@ void GorgZorg::goOnSend(qint64 numBytes) // Start sending file content
 void GorgZorg::acceptConnection()
 {
   QTextStream qout(stdout);
-  qout << Qt::endl << QLatin1String("Connected, preparing to receive files!") << Qt::endl;
+  qout << Qt::endl << QLatin1String("Connected, preparing to receive files!");
 
   m_receivedSocket = m_server->nextPendingConnection();
   QObject::connect(m_receivedSocket, SIGNAL(readyRead()), this, SLOT (readClient()));
