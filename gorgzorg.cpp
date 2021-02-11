@@ -44,7 +44,7 @@ void GorgZorg::connectAndSend(const QString &targetAddress, const QString &pathT
   while (it.hasNext())
   {
     QString traverse = it.next();
-    if (traverse.endsWith(".") || it.fileInfo().isDir()) continue;
+    if (traverse == "." || traverse == ".." || it.fileInfo().isDir()) continue;
 
     if (prepareToSendFile(traverse))
     {
