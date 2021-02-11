@@ -188,7 +188,7 @@ void GorgZorg::readClient()
     qout << Qt::endl << "Zorging " << m_currentFileName << Qt::endl;
     //currentPath.remove(".");
 
-    if (m_currentPath != "./")
+    if (!m_currentPath.isEmpty() && m_currentPath != "./")
     {
       QProcess p;
       QStringList params;
@@ -219,7 +219,7 @@ void GorgZorg::readClient()
     qout << QString("Zorging completed") << Qt::endl;
     m_inBlock.clear();
 
-    if (m_currentPath != "./")
+    if (!m_currentPath.isEmpty() && m_currentPath != "./")
     {
       QProcess p;
       QStringList params;
