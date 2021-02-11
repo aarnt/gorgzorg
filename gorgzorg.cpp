@@ -10,6 +10,7 @@
 #include <QProcess>
 #include <QDirIterator>
 #include <QEventLoop>
+#include <QNetworkInterface>
 
 GorgZorg::GorgZorg()
 {
@@ -217,7 +218,16 @@ void GorgZorg::startServer()
   m_byteReceived = 0;
   m_server = new QTcpServer(this);
   m_server->setMaxPendingConnections(1);
-  m_server->listen(QHostAddress("127.0.0.1"), m_port);
+  QString ipAddress;
+
+  const QHostAddress &localhost = QHostAddress(QHostAddress::LocalHost);
+  for (const QHostAddress &address: QNetworkInterface::allAddresses())
+  {
+      if (address.protocol() == QAbstractSocket::IPv4Protocol && address != localhost)
+           ipAddress = address.toString();
+  }
+
+  m_server->listen(QHostAddress(ipAddress), m_port);
 
   QObject::connect(m_server, SIGNAL(newConnection()), this, SLOT(acceptConnection()));
 

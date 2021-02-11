@@ -14,11 +14,17 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Core Network REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core Network REQUIRED)
 
-add_executable(gorgzorg
+set(src
   argumentlist.cpp
-  argumentlist.h
   gorgzorg.cpp
-  gorgzorg.h
   main.cpp
 )
+
+set(header
+  gorgzorg.h
+  argumentlist.h
+)
+
+add_executable(gorgzorg ${src} ${header})
+
 target_link_libraries(gorgzorg Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Network)
