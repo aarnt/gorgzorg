@@ -13,7 +13,6 @@ int main(int argc, char *argv[])
   QString target;
   QString pathToGorg;
   QString aux;
-
   QTextStream qout(stdout);
 
   if (argList->count() == 1)
@@ -40,24 +39,17 @@ int main(int argc, char *argv[])
   if (argList->contains("-z"))
   {
     aux = argList->getSwitchArg("-z");
-    if (!aux.isEmpty())
+    if (!aux.isEmpty() &&
+        !aux.startsWith("10.0") &&
+        !aux.startsWith("127.0.0") &&
+        !aux.startsWith("172.16") &&
+        !aux.startsWith("192.168"))
     {
-      if (!aux.startsWith("10.0") &&
-          !aux.startsWith("127.0.0") &&
-          !aux.startsWith("172.16") &&
-          !aux.startsWith("192.168"))
-      {
-        qout << "ERROR: GorgZorg can only be run in a local network!" << Qt::endl;
-        exit(1);
-      }
-
-      gz.startServer(aux);
-    }
-    else
-    {
-      qout << "ERROR: You should specify an IP address to bind to" << Qt::endl;
+      qout << "ERROR: GorgZorg can only be run in a local network!" << Qt::endl;
       exit(1);
     }
+
+    gz.startServer(aux);
   }
   else
   {

@@ -16,7 +16,7 @@ Usage:
     -d <ms>: Set delay to wait between file transfers (in ms, default is 100)
     -g <relativepath>: Set a relative filename or relative path to gorg (send)
     -p <portnumber>: Set port to connect or listen to connections (default is 10000)
-    -z <IP>: Enter Zorg mode (listen to connections)
+    -z [IP]: Enter Zorg mode (listen to connections). If IP is ommited, GorgZorg will guess it
 
 
 Examples:
