@@ -236,7 +236,7 @@ void GorgZorg::showHelp()
   qout << Qt::endl << "    -h: Show this help" << Qt::endl;
   qout << "    -c: Set IP or name to connect to" << Qt::endl;
   qout << "    -d: Set delay to wait between file transfers (in ms, default is 100)" << Qt::endl;
-  qout << "    -g: Set filename or path to gorg (send)" << Qt::endl;
+  qout << "    -g: Set a relative filename or relative path to gorg (send)" << Qt::endl;
   qout << "    -p: Set port to connect or listen to connections (default is 10000)" << Qt::endl;
   qout << "    -z: Enter Zorg mode (listen to connections)" << Qt::endl;
   qout << Qt::endl << "  Version: " << ctn_VERSION << Qt::endl << Qt::endl;
