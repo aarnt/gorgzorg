@@ -14,7 +14,7 @@ Usage:
 Examples:
 
 ```
-    gorgzorg -c 192.168.0.1 -g Test  #Send contents of Test directory to 192.168.0.1 IP
+ gorgzorg -c 192.168.0.1 -g Test  #Send contents of Test directory to 192.168.0.1 IP
 
-    gorgzorg -p 20000 -z  #Start listening on port 20000
+ gorgzorg -p 20000 -z  #Start listening on port 20000
 ```
