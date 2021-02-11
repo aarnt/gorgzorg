@@ -101,7 +101,7 @@ int main(int argc, char *argv[])
       pathToGorg=aux;
       if (pathToGorg.startsWith("/"))
       {
-        qout << "ERROR: GorgZorg only works with relative files or paths!" << Qt::endl;
+        qout << "ERROR: GorgZorg only works with relative files or relative paths!" << Qt::endl;
         exit(1);
       }
     }
