@@ -241,7 +241,9 @@ void GorgZorg::showHelp()
   qout << "    -z: Enter Zorg mode (listen to connections)" << Qt::endl;
   qout << Qt::endl << "  Version: " << ctn_VERSION << Qt::endl << Qt::endl;
   qout << Qt::endl << "  Examples:" << Qt::endl;
-  qout << Qt::endl << "    gorgzorg -c 192.168.0.1 -g Test  #Send contents of Test directory to 192.168.0.1 IP" << Qt::endl;
-  qout << Qt::endl <<"    gorgzorg -p 20000 -z  #Start listening on port 20000" << Qt::endl << Qt::endl;
+  qout << Qt::endl << "    #Send contents of Test directory to IP 192.168.0.1" << Qt::endl;
+  qout << "    gorgzorg -c 192.168.0.1 -g Test" << Qt::endl;
+  qout << Qt::endl << "    #Start listening on port 20000" << Qt::endl;
+  qout << "    gorgzorg -p 20000 -z" << Qt::endl << Qt::endl;
   exit(0);
 }
