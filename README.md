@@ -1,7 +1,15 @@
 ## GorgZorg is a simple network file transfer tool
 
-Usage:
+Compilation:
 
+```
+$git clone https://github.com/aarnt/gorgzorg
+$cd gorgzorg
+$cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr
+$make
+```
+
+Usage:
 
     -h: Show this help
     -c: Set IP or name to connect to
