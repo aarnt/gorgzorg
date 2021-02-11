@@ -21,9 +21,10 @@ int main(int argc, char *argv[])
     bool ok;
     int port = aux.toInt(&ok);
 
-    if (port == 0 || port > 65535)
+    if (port <= 0 || port > 65535)
     {
       qout << "ERROR: Valid port numbers are between 1 and 65535!" << Qt::endl;
+      exit(1);
     }
     else
       gz.setPort(port);
@@ -62,6 +63,11 @@ int main(int argc, char *argv[])
         exit(1);
       }
     }
+    else
+    {
+      qout << "ERROR: You should specify an IP to connect to!" << Qt::endl;
+      exit(1);
+    }
 
     aux = argList->getSwitchArg("-d");
     if (!aux.isEmpty())
@@ -70,7 +76,14 @@ int main(int argc, char *argv[])
       int delay = aux.toInt(&ok);
 
       if (delay != 0)
+      {
         gz.setDelay(delay);
+      }
+      else
+      {
+        qout << "ERROR: You should specify a delay value!" << Qt::endl;
+        exit(1);
+      }
     }
 
     aux = argList->getSwitchArg("-g");
@@ -82,6 +95,11 @@ int main(int argc, char *argv[])
         qout << "ERROR: GorgZorg only works with relative files or paths!" << Qt::endl;
         exit(1);
       }
+    }
+    else
+    {
+      qout << "ERROR: You should specify a relative filename or relative path to gorg (send)!" << Qt::endl;
+      exit(1);
     }
 
     if (!target.isEmpty() && !pathToGorg.isEmpty())

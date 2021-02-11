@@ -12,11 +12,11 @@ $make
 Usage:
 
     -h: Show this help
-    -c: Set IP or name to connect to
-    -d: Set delay to wait between file transfers (in ms, default is 100)
-    -g: Set a relative filename or relative path to gorg (send)
-    -p: Set port to connect or listen to connections (default is 10000)
-    -z: Enter Zorg mode (listen to connections)
+    -c <IP>: Set IP or name to connect to
+    -d <ms>: Set delay to wait between file transfers (in ms, default is 100)
+    -g <relativepath>: Set a relative filename or relative path to gorg (send)
+    -p <portnumber>: Set port to connect or listen to connections (default is 10000)
+    -z <IP>: Enter Zorg mode (listen to connections)
 
 
 Examples:

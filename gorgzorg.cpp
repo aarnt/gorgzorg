@@ -244,11 +244,11 @@ void GorgZorg::showHelp()
 
   qout << Qt::endl << "  GorgZorg, a simple network file transfer tool" << Qt::endl;
   qout << Qt::endl << "    -h: Show this help" << Qt::endl;
-  qout << "    -c: Set IP or name to connect to" << Qt::endl;
-  qout << "    -d: Set delay to wait between file transfers (in ms, default is 100)" << Qt::endl;
-  qout << "    -g: Set a relative filename or relative path to gorg (send)" << Qt::endl;
-  qout << "    -p: Set port to connect or listen to connections (default is 10000)" << Qt::endl;
-  qout << "    -z: Enter Zorg mode (listen to connections)" << Qt::endl;
+  qout << "    -c <IP>: Set IP or name to connect to" << Qt::endl;
+  qout << "    -d <ms>: Set delay to wait between file transfers (in ms, default is 100)" << Qt::endl;
+  qout << "    -g <relativepath>: Set a relative filename or relative path to gorg (send)" << Qt::endl;
+  qout << "    -p <portnumber>: Set port to connect or listen to connections (default is 10000)" << Qt::endl;
+  qout << "    -z <IP>: Enter Zorg mode (listen to connections)" << Qt::endl;
   qout << Qt::endl << "  Version: " << ctn_VERSION << Qt::endl << Qt::endl;
   qout << Qt::endl << "  Examples:" << Qt::endl;
   qout << Qt::endl << "    #Send contents of Test directory to IP 192.168.0.1" << Qt::endl;
