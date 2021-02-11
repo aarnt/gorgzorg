@@ -8,7 +8,8 @@
 int main(int argc, char *argv[])
 {
   QCoreApplication a(argc, argv);
-  ArgumentList *argList = new ArgumentList(argc, argv);  
+  ArgumentList *argList = new ArgumentList(argc, argv);
+
   GorgZorg gz;
   QString target;
   QString pathToGorg;
@@ -121,7 +122,6 @@ int main(int argc, char *argv[])
     if (!target.isEmpty() && !pathToGorg.isEmpty())
     {
       gz.connectAndSend(target, pathToGorg);
-      qout << Qt::endl;
     }
   }
 

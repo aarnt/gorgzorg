@@ -98,6 +98,8 @@ void GorgZorg::connectAndSend(const QString &targetAddress, const QString &pathT
     }
   }
 
+  QTextStream qout(stdout);
+  qout << Qt::endl;
   exit(0);
 }
 
@@ -245,8 +247,15 @@ void GorgZorg::readClient()
 
     if (!m_currentPath.isEmpty() && m_currentPath != "./")
     {
-      QDir mover;
-      mover.rename(m_currentFileName, m_currentPath + QDir::separator() + m_currentFileName);
+      QProcess p;
+      QStringList params;
+      params << m_currentFileName;
+      m_currentPath.remove("./");
+      params << m_currentPath;
+      p.execute("mv", params);
+
+      /*QDir mover;
+      mover.rename(m_currentFileName, m_currentPath + QDir::separator() + m_currentFileName);*/
     }
 
     m_byteReceived = 0;
