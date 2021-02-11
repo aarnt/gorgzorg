@@ -12,6 +12,16 @@
 #include <QEventLoop>
 //#include <QNetworkInterface>
 
+void qSleep(int ms)
+{
+#ifdef Q_OS_WIN
+    Sleep(uint(ms));
+#else
+    struct timespec ts = { ms / 1000, (ms % 1000) * 1000 * 1000 };
+    nanosleep(&ts, NULL);
+#endif
+}
+
 GorgZorg::GorgZorg()
 {
   QTextCodec::setCodecForLocale(QTextCodec::codecForName ("GBK"));
@@ -22,16 +32,6 @@ GorgZorg::GorgZorg()
 
   QObject::connect(m_tcpClient, SIGNAL(connected()), this, SLOT(send())); // When the connection is successful, start to transfer files
   QObject::connect(m_tcpClient, SIGNAL(bytesWritten(qint64)), this, SLOT(goOnSend(qint64)));
-}
-
-void qSleep(int ms)
-{
-#ifdef Q_OS_WIN
-    Sleep(uint(ms));
-#else
-    struct timespec ts = { ms / 1000, (ms % 1000) * 1000 * 1000 };
-    nanosleep(&ts, NULL);
-#endif
 }
 
 /*
@@ -231,7 +231,7 @@ void GorgZorg::startServer(const QString &ipAddress)
   QObject::connect(m_server, SIGNAL(newConnection()), this, SLOT(acceptConnection()));
 
   QTextStream qout(stdout);
-  qout << "Start zorging on port " << m_port << "..." << Qt::endl;
+  qout << QString("Start zorging with IP %1 on port %2...").arg(ipAddress).arg(m_port) << Qt::endl;
 }
 
 /*
