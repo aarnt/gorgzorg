@@ -197,9 +197,6 @@ void GorgZorg::readClient()
       p.execute("mkdir", params);
     }
 
-    //m_fileName = "Files /" + fileName;
-    //fileName=m_fileName;
-
     m_newFile = new QFile(m_currentFileName);
     m_newFile->open(QFile :: WriteOnly);
   }
@@ -222,12 +219,15 @@ void GorgZorg::readClient()
     qout << QString("Zorging completed") << Qt::endl;
     m_inBlock.clear();
 
-    QProcess p;
-    QStringList params;
-    params << m_currentFileName;
-    m_currentPath.remove("./");
-    params << m_currentPath;
-    p.execute("mv", params);
+    if (m_currentPath != "./")
+    {
+      QProcess p;
+      QStringList params;
+      params << m_currentFileName;
+      m_currentPath.remove("./");
+      params << m_currentPath;
+      p.execute("mv", params);
+    }
 
     m_byteReceived = 0;
     m_totalSize = 0;
