@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
     exit(1);
   }
 
-  aux = argList->getSwitchArg("-p");
+  aux = argList->getSwitchArg(QLatin1String("-p"));
   if (!aux.isEmpty())
   {
     bool ok;
@@ -29,23 +29,23 @@ int main(int argc, char *argv[])
 
     if (port <= 0 || port > 65535)
     {
-      qout << "ERROR: Valid port numbers are between 1 and 65535!" << Qt::endl;
+      qout << QLatin1String("ERROR: Valid port numbers are between 1 and 65535!") << Qt::endl;
       exit(1);
     }
     else
       gz.setPort(port);
   }
 
-  if (argList->contains("-z"))
+  if (argList->contains(QLatin1String("-z")))
   {
-    aux = argList->getSwitchArg("-z");
+    aux = argList->getSwitchArg(QLatin1String("-z"));
     if (!aux.isEmpty() &&
-        !aux.startsWith("10.0") &&
-        !aux.startsWith("127.0.0") &&
-        !aux.startsWith("172.16") &&
-        !aux.startsWith("192.168"))
+        !aux.startsWith(QLatin1String("10.0")) &&
+        !aux.startsWith(QLatin1String("127.0.0")) &&
+        !aux.startsWith(QLatin1String("172.16")) &&
+        !aux.startsWith(QLatin1String("192.168")))
     {
-      qout << "ERROR: GorgZorg can only be run in a local network!" << Qt::endl;
+      qout << QLatin1String("ERROR: GorgZorg can only be run in a local network!") << Qt::endl;
       exit(1);
     }
 
@@ -68,13 +68,13 @@ int main(int argc, char *argv[])
           !target.startsWith("172.16") &&
           !target.startsWith("192.168"))
       {
-        qout << "ERROR: GorgZorg can only be run in a local network!" << Qt::endl;
+        qout << QLatin1String("ERROR: GorgZorg can only be run in a local network!") << Qt::endl;
         exit(1);
       }
     }
     else
     {
-      qout << "ERROR: You should specify an IP to connect to!" << Qt::endl;
+      qout << QLatin1String("ERROR: You should specify an IP to connect to!") << Qt::endl;
       exit(1);
     }
 
@@ -90,24 +90,30 @@ int main(int argc, char *argv[])
       }
       else
       {
-        qout << "ERROR: You should specify a delay value!" << Qt::endl;
+        qout << QLatin1String("ERROR: You should specify a delay value!") << Qt::endl;
         exit(1);
       }
     }
 
-    aux = argList->getSwitchArg("-g");
+    //Checks if the user wants path to be "tared"
+    if (argList->getSwitch(QLatin1String("-tar")))
+    {
+      gz.setTarContents();
+    }
+
+    aux = argList->getSwitchArg(QLatin1String("-g"));
     if (!aux.isEmpty())
     {
       pathToGorg=aux;
-      if (pathToGorg.startsWith("/"))
+      if (pathToGorg.startsWith(QLatin1String("/")))
       {
-        qout << "ERROR: GorgZorg only works with relative files or relative paths!" << Qt::endl;
+        qout << QLatin1String("ERROR: GorgZorg only works with relative files or relative paths!") << Qt::endl;
         exit(1);
       }
     }
     else
     {
-      qout << "ERROR: You should specify a relative filename or relative path to gorg (send)!" << Qt::endl;
+      qout << QLatin1String("ERROR: You should specify a relative filename or relative path to gorg (send)!") << Qt::endl;
       exit(1);
     }
 

@@ -26,6 +26,7 @@ private:
   QString m_targetAddress;
   int m_delay;
   int m_port;
+  bool m_tarContents;
 
   QTcpServer *m_server;
   QTcpSocket *m_receivedSocket;
@@ -43,15 +44,16 @@ private:
 private slots:
   void acceptConnection();
   void readClient();
-
   void send();            //Transfer file header information
   void goOnSend(qint64);  //Transfer file contents
 
 public:
   void connectAndSend(const QString &targetAddress, const QString &pathToGorg);
   void startServer(const QString &ipAddress = "");
+
   inline void setDelay(int delay) { m_delay = delay; }
   inline void setPort(int port) { m_port = port; }
+  inline void setTarContents() { m_tarContents = true; }
 
   void showHelp();
 
