@@ -25,6 +25,6 @@ Examples:
 #Send contents of Test directory to IP 192.168.0.1
 gorgzorg -c 192.168.0.1 -g Test  
 
-#Start listening on port 20000
-gorgzorg -p 20000 -z i
- ```
+#Start listening on port 20000 with address 192.168.10.16
+gorgzorg -p 20000 -z 192.168.10.16
+```

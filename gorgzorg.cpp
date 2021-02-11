@@ -10,7 +10,7 @@
 #include <QProcess>
 #include <QDirIterator>
 #include <QEventLoop>
-#include <QNetworkInterface>
+//#include <QNetworkInterface>
 
 GorgZorg::GorgZorg()
 {
@@ -212,20 +212,20 @@ void GorgZorg::readClient()
   }
 }
 
-void GorgZorg::startServer()
+void GorgZorg::startServer(const QString &ipAddress)
 {
   m_totalSize = 0;
   m_byteReceived = 0;
   m_server = new QTcpServer(this);
   m_server->setMaxPendingConnections(1);
-  QString ipAddress;
+  //QString ipAddress;
 
-  const QHostAddress &localhost = QHostAddress(QHostAddress::LocalHost);
+  /*const QHostAddress &localhost = QHostAddress(QHostAddress::LocalHost);
   for (const QHostAddress &address: QNetworkInterface::allAddresses())
   {
       if (address.protocol() == QAbstractSocket::IPv4Protocol && address != localhost)
            ipAddress = address.toString();
-  }
+  }*/
 
   m_server->listen(QHostAddress(ipAddress), m_port);
 
@@ -253,7 +253,7 @@ void GorgZorg::showHelp()
   qout << Qt::endl << "  Examples:" << Qt::endl;
   qout << Qt::endl << "    #Send contents of Test directory to IP 192.168.0.1" << Qt::endl;
   qout << "    gorgzorg -c 192.168.0.1 -g Test" << Qt::endl;
-  qout << Qt::endl << "    #Start listening on port 20000" << Qt::endl;
-  qout << "    gorgzorg -p 20000 -z" << Qt::endl << Qt::endl;
+  qout << Qt::endl << "    #Start listening on port 20000 with address 192.168.10.16" << Qt::endl;
+  qout << "    gorgzorg -p 20000 -z 192.168.10.16" << Qt::endl << Qt::endl;
   exit(0);
 }

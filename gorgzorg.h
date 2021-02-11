@@ -47,7 +47,7 @@ private slots:
 
 public:
   void connectAndSend(const QString &targetAddress, const QString &pathToGorg);
-  void startServer();
+  void startServer(const QString &ipAddress);
   inline void setDelay(int delay) { m_delay = delay; }
   inline void setPort(int port) { m_port = port; }
 

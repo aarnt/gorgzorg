@@ -21,13 +21,26 @@ int main(int argc, char *argv[])
     bool ok;
     int port = aux.toInt(&ok);
 
-    if (port != 0)
+    if (port == 0 || port > 65535)
+    {
+      qout << "ERROR: Valid port numbers are between 1 and 65535!" << Qt::endl;
+    }
+    else
       gz.setPort(port);
   }
 
-  if (argList->getSwitch(QStringLiteral("-z")) || argList->count() == 1)
+  if (argList->contains("-z"))
   {
-    gz.startServer();
+    aux = argList->getSwitchArg("-z");
+    if (!aux.isEmpty())
+    {
+      gz.startServer(aux);
+    }
+    else
+    {
+      qout << "ERROR: You should specify an IP address to bind to" << Qt::endl;
+      exit(1);
+    }
   }
   else
   {
