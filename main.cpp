@@ -15,6 +15,12 @@ int main(int argc, char *argv[])
   QString aux;
   QTextStream qout(stdout);
 
+  if (argList->count() == 1)
+  {
+    gz.showHelp();
+    exit(1);
+  }
+
   aux = argList->getSwitchArg("-p");
   if (!aux.isEmpty())
   {
@@ -48,6 +54,7 @@ int main(int argc, char *argv[])
     if (argList->getSwitch("-h"))
     {
       gz.showHelp();
+      exit(0);
     }
 
     aux = argList->getSwitchArg("-c");

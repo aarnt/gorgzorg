@@ -219,7 +219,6 @@ void GorgZorg::startServer(const QString &ipAddress)
   m_server = new QTcpServer(this);
   m_server->setMaxPendingConnections(1);
   //QString ipAddress;
-
   /*const QHostAddress &localhost = QHostAddress(QHostAddress::LocalHost);
   for (const QHostAddress &address: QNetworkInterface::allAddresses())
   {
@@ -255,5 +254,4 @@ void GorgZorg::showHelp()
   qout << "    gorgzorg -c 192.168.0.1 -g Test" << Qt::endl;
   qout << Qt::endl << "    #Start listening on port 20000 with address 192.168.10.16" << Qt::endl;
   qout << "    gorgzorg -p 20000 -z 192.168.10.16" << Qt::endl << Qt::endl;
-  exit(0);
 }
