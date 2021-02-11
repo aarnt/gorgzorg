@@ -39,14 +39,10 @@ GorgZorg::GorgZorg()
  */
 void GorgZorg::connectAndSend(const QString &targetAddress, const QString &pathToGorg)
 {
-  //Loop thru the files in the pathToGorg
-  QDirIterator it(pathToGorg, QDir::AllEntries | QDir::Hidden | QDir::System, QDirIterator::Subdirectories);
-  while (it.hasNext())
+  QFileInfo fi(pathToGorg);
+  if (fi.isFile())
   {
-    QString traverse = it.next();
-    if (traverse == "." || traverse == ".." || it.fileInfo().isDir()) continue;
-
-    if (prepareToSendFile(traverse))
+    if (prepareToSendFile(pathToGorg))
     {
       if (m_sendTimes == 0) // Only the first time it is sent, it happens when the connection generates the signal connect
       {
@@ -61,6 +57,32 @@ void GorgZorg::connectAndSend(const QString &targetAddress, const QString &pathT
     QObject::connect(this, SIGNAL(endTransfer()), &eventLoop, SLOT(quit()));
     eventLoop.exec();
     qSleep(m_delay);
+  }
+  else
+  {
+    //Loop thru the files in the pathToGorg
+    QDirIterator it(pathToGorg, QDir::AllEntries | QDir::Hidden | QDir::System, QDirIterator::Subdirectories);
+    while (it.hasNext())
+    {
+      QString traverse = it.next();
+      if (traverse == "." || traverse == ".." || it.fileInfo().isDir()) continue;
+
+      if (prepareToSendFile(traverse))
+      {
+        if (m_sendTimes == 0) // Only the first time it is sent, it happens when the connection generates the signal connect
+        {
+          m_tcpClient->connectToHost(QHostAddress(targetAddress), m_port);
+          m_sendTimes = 1;
+        }
+        else
+          send(); // When sending for the first time, connectToHost initiates the connect signal to call send, and you need to call send after the second time
+      }
+
+      QEventLoop eventLoop;
+      QObject::connect(this, SIGNAL(endTransfer()), &eventLoop, SLOT(quit()));
+      eventLoop.exec();
+      qSleep(m_delay);
+    }
   }
 
   exit(0);
