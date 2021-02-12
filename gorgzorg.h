@@ -31,6 +31,7 @@ class QFile;
 class QTimer;
 
 const QString ctn_VERSION="0.1";
+const QString ctn_DIR_ESCAPE="<^dir$>:";
 
 class GorgZorg: public QObject
 {
@@ -47,9 +48,12 @@ private:
   QString m_currentFileName;
   QString m_targetAddress;
   QTimer *m_timer;
-  int m_delay;  
+
+  int m_delay;
   int m_port;
   bool m_tarContents;
+  bool m_sendingADir;
+  bool m_receivingADir;
 
   QTcpServer *m_server;
   QTcpSocket *m_receivedSocket;

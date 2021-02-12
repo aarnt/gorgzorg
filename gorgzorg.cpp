@@ -142,7 +142,10 @@ void GorgZorg::connectAndSend(const QString &targetAddress, const QString &pathT
       while (it.hasNext())
       {
         QString traverse = it.next();
-        if (traverse == QLatin1String(".") || traverse == QLatin1String("..") || it.fileInfo().isDir()) continue;
+        if (traverse.endsWith(QLatin1String(".")) || traverse.endsWith(QLatin1String("..")) /*|| it.fileInfo().isDir()*/) continue;
+
+        if (it.fileInfo().isDir())
+          traverse = ctn_DIR_ESCAPE + traverse;
 
         sendFile(traverse);
       }
@@ -164,13 +167,21 @@ bool GorgZorg::prepareToSendFile(const QString &fName)
   m_byteToWrite = 0;
   m_totalSize = 0;
   m_outBlock.clear();
+  m_sendingADir = false;
   QTextStream qout(stdout);
 
-  m_localFile = new QFile(fileName);
-  if (!m_localFile->open(QFile :: ReadOnly))
+  if (fName.startsWith(ctn_DIR_ESCAPE))
   {
-    qout << QLatin1String("ERROR: %1 could not be opened").arg(fName) << Qt::endl;
-    return false;
+    m_sendingADir = true;
+  }
+  else
+  {
+    m_localFile = new QFile(fileName);
+    if (!m_localFile->open(QFile::ReadOnly))
+    {
+      qout << QLatin1String("ERROR: %1 could not be opened").arg(fileName) << Qt::endl;
+      return false;
+    }
   }
 
   return true;
@@ -179,14 +190,32 @@ bool GorgZorg::prepareToSendFile(const QString &fName)
 // Send file header information
 void GorgZorg::send()
 {
-  m_byteToWrite = m_localFile->size(); //The size of the remaining data
-  m_totalSize = m_localFile->size();
   m_loadSize = 4 * 1024; // The size of data sent each time
+
+  if (m_sendingADir)
+  {
+    m_byteToWrite = 0; //m_loadSize;
+    m_totalSize = 0; //m_loadSize;
+  }
+  else
+  {
+    m_byteToWrite = m_localFile->size(); //The size of the remaining data
+    m_totalSize = m_localFile->size();
+  }
 
   QDataStream out(&m_outBlock, QIODevice::WriteOnly);
   m_currentFileName = m_fileName;
   QTextStream qout(stdout);
-  qout << Qt::endl << QLatin1String("Gorging %1").arg(m_currentFileName) << Qt::endl;
+
+  if (m_sendingADir)
+  {
+    QString aux = QLatin1String("Gorging dir %1").arg(m_currentFileName);
+    qout << Qt::endl << aux.remove(ctn_DIR_ESCAPE) << Qt::endl;
+  }
+  else
+  {
+    qout << Qt::endl << QLatin1String("Gorging %1").arg(m_currentFileName) << Qt::endl;
+  }
 
   out << qint64 (0) << qint64 (0) << m_currentFileName;
 
@@ -204,9 +233,18 @@ void GorgZorg::send()
 
 void GorgZorg::goOnSend(qint64 numBytes) // Start sending file content
 {
-  m_byteToWrite-= numBytes; // Remaining data size
-  m_outBlock = m_localFile->read(qMin(m_byteToWrite, m_loadSize));
-  m_tcpClient->write(m_outBlock);
+  m_byteToWrite -= numBytes; // Remaining data size
+
+  if (m_sendingADir)
+  {
+    m_outBlock.resize(0);
+    m_tcpClient->write(m_outBlock);
+  }
+  else
+  {
+    m_outBlock = m_localFile->read(qMin(m_byteToWrite, m_loadSize));
+    m_tcpClient->write(m_outBlock);
+  }
 
   //ui-> sendProgressBar->setMaximum(totalSize);
   //ui-> sendProgressBar->setValue(totalSize-byteToWrite);
@@ -260,6 +298,14 @@ void GorgZorg::readClient()
     int cutName=m_fileName.size()-m_fileName.lastIndexOf('/')-1;
     m_currentFileName = m_fileName.right(cutName);
     m_currentPath = m_fileName.left(m_fileName.size()-cutName);
+    m_receivingADir = false;
+
+    //dir:directory/subdirectory
+    if (m_currentPath.startsWith(ctn_DIR_ESCAPE))
+    {
+      m_receivingADir = true;
+      m_currentPath.remove(ctn_DIR_ESCAPE);
+    }
 
     qout << Qt::endl << QLatin1String("Zorging %1").arg(m_currentFileName) << Qt::endl;
 
@@ -274,15 +320,41 @@ void GorgZorg::readClient()
       p.execute(QLatin1String("mkdir"), params);
     }
 
-    m_newFile = new QFile(m_currentFileName);
-    m_newFile->open(QFile :: WriteOnly);
+    if (m_receivingADir)
+    {
+      QProcess p;
+      QStringList params;
+      params << QLatin1String("-p");
+      params << m_currentPath + QDir::separator() + m_currentFileName;
+      p.execute(QLatin1String("mkdir"), params);
+
+      m_inBlock = m_receivedSocket->readAll();
+      m_byteReceived += m_inBlock.size();
+      //qout << QLatin1String("Received %1 bytes of %2").arg(QString::number(m_byteReceived)).arg(QString::number(m_totalSize)) << Qt::endl;
+    }
+    else
+    {
+      if (m_currentPath.isEmpty())
+        m_newFile = new QFile(m_currentFileName);
+      else
+        m_newFile = new QFile(m_currentPath + QDir::separator() + m_currentFileName);
+
+      m_newFile->open(QFile :: WriteOnly);
+      m_inBlock = m_receivedSocket->readAll();
+      m_byteReceived += m_inBlock.size();
+    }
   }
   else // Officially read the file content
   {
     m_inBlock = m_receivedSocket->readAll();
-    m_byteReceived += m_inBlock.size ();
-    m_newFile->write(m_inBlock);
-    m_newFile->flush();
+    m_byteReceived += m_inBlock.size();
+    //qout << QLatin1String("Received again %1 bytes of %2").arg(QString::number(m_byteReceived)).arg(QString::number(m_totalSize)) << Qt::endl;
+
+    if (!m_receivingADir)
+    {
+      m_newFile->write(m_inBlock);
+      m_newFile->flush();
+    }
   }
 
   //ui-> receivedProgressBar->setMaximum(totalSize);
@@ -293,16 +365,6 @@ void GorgZorg::readClient()
     QTextStream qout(stdout);
     qout << QLatin1String("Zorging completed") << Qt::endl;
     m_inBlock.clear();
-
-    if (!m_currentPath.isEmpty() && m_currentPath != "./")
-    {
-      QProcess p;
-      QStringList params;
-      params << m_currentFileName;
-      m_currentPath.remove("./");
-      params << m_currentPath;
-      p.execute("mv", params);
-    }
 
     m_byteReceived = 0;
     m_totalSize = 0;
