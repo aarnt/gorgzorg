@@ -1,4 +1,4 @@
-## GorgZorg is a simple network file transfer too
+## GorgZorg is a simple network file transfer tool
 
 Do you need to copy files or folders between Unix machines but don't want to create shares?
 So, this is the tool you have been waiting for.
