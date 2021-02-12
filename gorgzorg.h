@@ -1,5 +1,7 @@
 /*
 * This file is part of GorgZorg, a simple CLI network file transfer tool.
+* It was strongly inspired by the following article:
+* https://topic.alibabacloud.com/a/file-transfer-using-the-tcp-protocol-in-qt-can-be-looped-in-one-direction_8_8_10249539.html
 * Copyright (C) 2021 Alexandre Albuquerque Arnt
 *
 * This program is free software; you can redistribute it and/or modify
