@@ -326,8 +326,10 @@ void GorgZorg::showHelp()
   qout << QLatin1String("    -z [IP]: Enter Zorg mode (listen to connections). If IP is ommited, GorgZorg will guess it") << Qt::endl;
   qout << Qt::endl << QLatin1String("  Version: ") << ctn_VERSION << Qt::endl << Qt::endl;
   qout << Qt::endl << QLatin1String("  Examples:") << Qt::endl;
-  qout << Qt::endl << QLatin1String("    #Send contents of Test directory to IP 192.168.0.1") << Qt::endl;
-  qout << QLatin1String("    gorgzorg -c 192.168.0.1 -g Test") << Qt::endl;
-  qout << Qt::endl << QLatin1String("    #Start listening on port 20000 with address 192.168.10.16") << Qt::endl;
+  qout << Qt::endl << QLatin1String("    #Send contents of Test directory to IP 192.168.1.1") << Qt::endl;
+  qout << QLatin1String("    gorgzorg -c 192.168.1.1 -g Test") << Qt::endl;
+  qout << Qt::endl << QLatin1String("    #Send archived contents of Crucial directory to IP 172.16.20.21") << Qt::endl;
+  qout << QLatin1String("    gorgzorg -c 172.16.20.21 -g Crucial -tar") << Qt::endl;
+  qout << Qt::endl << QLatin1String("    #Start a server GorgZorg to listen on address 192.168.10.16:20000") << Qt::endl;
   qout << QLatin1String("    gorgzorg -p 20000 -z 192.168.10.16") << Qt::endl << Qt::endl;
 }
