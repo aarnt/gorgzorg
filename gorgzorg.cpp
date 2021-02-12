@@ -152,7 +152,6 @@ void GorgZorg::send()
   m_loadSize = 4 * 1024; // The size of data sent each time
 
   QDataStream out(&m_outBlock, QIODevice::WriteOnly);
-  //QString currentFileName = m_fileName;
   m_currentFileName = m_fileName;
   QTextStream qout(stdout);
   qout << Qt::endl << QLatin1String("Gorging %1").arg(m_currentFileName) << Qt::endl;
@@ -273,9 +272,6 @@ void GorgZorg::readClient()
       m_currentPath.remove("./");
       params << m_currentPath;
       p.execute("mv", params);
-
-      /*QDir mover;
-      mover.rename(m_currentFileName, m_currentPath + QDir::separator() + m_currentFileName);*/
     }
 
     m_byteReceived = 0;
