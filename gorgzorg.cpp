@@ -96,8 +96,15 @@ void GorgZorg::sendFile(const QString &filePath)
  */
 void GorgZorg::connectAndSend(const QString &targetAddress, const QString &pathToGorg)
 {
+  QTextStream qout(stdout);
   m_targetAddress = targetAddress;
   QFileInfo fi(pathToGorg);
+
+  if (!fi.exists())
+  {
+    qout << QLatin1String("ERROR: %1 could not be found!").arg(pathToGorg) << Qt::endl;
+    exit(1);
+  }
 
   if (fi.isFile())
   {
@@ -136,7 +143,6 @@ void GorgZorg::connectAndSend(const QString &targetAddress, const QString &pathT
     }
   }
 
-  QTextStream qout(stdout);
   qout << Qt::endl;
   exit(0);
 }
