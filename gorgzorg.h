@@ -22,7 +22,6 @@
 #define GORGZORG_H
 
 #include <QObject>
-#include <string>
 
 class QTcpSocket;
 class QTcpServer;
@@ -81,7 +80,6 @@ public:
 
 signals:
   void endTransfer();
-
 };
 
 #endif // GORGZORG_H
