@@ -5,10 +5,18 @@ So, this is the tool you have been waiting for.
 
 ### What you need to compile GorgZorg
 
-* CMake
+* QMake or CMake
 * Qt5 toolkit
 
-### How to compile GorgZorg
+### How to compile GorgZorg using QMake
+```
+$git clone https://github.com/aarnt/gorgzorg
+$cd gorgzorg
+$qmake-qt5
+$make
+```
+
+### How to compile GorgZorg using CMake
 
 ```
 $git clone https://github.com/aarnt/gorgzorg
