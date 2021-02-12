@@ -330,7 +330,7 @@ void GorgZorg::showHelp()
 {
   QTextStream qout(stdout);
 
-  qout << Qt::endl << QLatin1String("  GorgZorg, a simple network file transfer tool") << Qt::endl;
+  qout << Qt::endl << QLatin1String("  GorgZorg, a simple CLI network file transfer tool") << Qt::endl;
   qout << Qt::endl << QLatin1String("    -h: Show this help") << Qt::endl;
   qout << QLatin1String("    -c <IP>: Set IP or name to connect to") << Qt::endl;
   qout << QLatin1String("    -d <ms>: Set delay to wait between file transfers (in ms, default is 100)") << Qt::endl;

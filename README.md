@@ -1,9 +1,14 @@
-## GorgZorg is a simple network file transfer tool
+## GorgZorg is a simple CLI network file transfer tool
 
 Do you need to copy files or folders between Unix machines but don't want to create shares?
 So, this is the tool you have been waiting for.
 
-How to compile GorgZorg:
+### What you need to compile GorgZorg
+
+* CMake
+* Qt5 toolkit
+
+### How to compile GorgZorg
 
 ```
 $git clone https://github.com/aarnt/gorgzorg
@@ -12,7 +17,7 @@ $cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/us
 $make
 ```
 
-How to use GorgZorg:
+### How to use GorgZorg
 
     -h: Show this help
     -c <IP>: Set IP or name to connect to
@@ -23,7 +28,7 @@ How to use GorgZorg:
     -z [IP]: Enter Zorg mode (listen to connections). If IP is ommited, GorgZorg will guess it
 
 
-Examples:
+### Examples
 
 ```
 #Send contents of Test directory to IP 192.168.1.1
