@@ -274,6 +274,11 @@ void GorgZorg::goOnSend(qint64 numBytes) // Start sending file content
       QFile::remove(path);
     }
 
+    if (!m_sendingADir)
+    {
+      m_localFile->close();
+    }
+
     emit endTransfer();
   }
 }
@@ -371,6 +376,11 @@ void GorgZorg::readClient()
     QTextStream qout(stdout);
     qout << QLatin1String("Zorging completed") << Qt::endl;
     m_inBlock.clear();
+
+    if (!m_receivingADir)
+    {
+      m_newFile->close();
+    }
 
     m_byteReceived = 0;
     m_totalSize = 0;
