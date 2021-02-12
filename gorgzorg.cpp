@@ -364,6 +364,6 @@ void GorgZorg::showHelp()
   qout << QLatin1String("    gorgzorg -c 192.168.1.1 -g Test") << Qt::endl;
   qout << Qt::endl << QLatin1String("    #Send archived contents of Crucial directory to IP 172.16.20.21") << Qt::endl;
   qout << QLatin1String("    gorgzorg -c 172.16.20.21 -g Crucial -tar") << Qt::endl;
-  qout << Qt::endl << QLatin1String("    #Start a server GorgZorg to listen on address 192.168.10.16:20000") << Qt::endl;
+  qout << Qt::endl << QLatin1String("    #Start a GorgZorg server on address 192.168.10.16:20000") << Qt::endl;
   qout << QLatin1String("    gorgzorg -p 20000 -z 192.168.10.16") << Qt::endl << Qt::endl;
 }

@@ -37,6 +37,6 @@ gorgzorg -c 192.168.1.1 -g Test
 #Send archived contents of Crucial directory to IP 172.16.20.21
 gorgzorg -c 172.16.20.21 -g Crucial -tar
 
-#Start a server GorgZorg to listen on address 192.168.10.16:20000
+#Start a GorgZorg server on address 192.168.10.16:20000
 gorgzorg -p 20000 -z 192.168.10.16
 ```
