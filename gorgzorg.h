@@ -7,6 +7,7 @@
 class QTcpSocket;
 class QTcpServer;
 class QFile;
+class QTimer;
 
 const QString ctn_VERSION="0.1";
 
@@ -24,7 +25,8 @@ private:
   QString m_currentPath;
   QString m_currentFileName;
   QString m_targetAddress;
-  int m_delay;
+  QTimer *m_timer;
+  int m_delay;  
   int m_port;
   bool m_tarContents;
 
@@ -46,16 +48,16 @@ private slots:
   void readClient();
   void send();            //Transfer file header information
   void goOnSend(qint64);  //Transfer file contents
+  void onTimeout();
 
 public:
   void connectAndSend(const QString &targetAddress, const QString &pathToGorg);
   void startServer(const QString &ipAddress = "");
+  void showHelp();
 
   inline void setDelay(int delay) { m_delay = delay; }
   inline void setPort(int port) { m_port = port; }
   inline void setTarContents() { m_tarContents = true; }
-
-  void showHelp();
 
 signals:
   void endTransfer();

@@ -12,6 +12,7 @@
 #include <QEventLoop>
 #include <QNetworkInterface>
 #include <QRandomGenerator>
+#include <QTimer>
 
 void qSleep(int ms)
 {
@@ -27,14 +28,28 @@ GorgZorg::GorgZorg()
 {
   QTextCodec::setCodecForLocale(QTextCodec::codecForName ("GBK"));
   m_tcpClient = new QTcpSocket (this);
-  m_sendTimes = 0;
+  m_sendTimes = 0;  
   m_targetAddress = "";
   m_delay = 100;
   m_port = 10000;
+  m_timer = new QTimer(this);
+  m_timer->setSingleShot(true);
   m_tarContents = false;
 
-  QObject::connect(m_tcpClient, SIGNAL(connected()), this, SLOT(send())); // When the connection is successful, start to transfer files
-  QObject::connect(m_tcpClient, SIGNAL(bytesWritten(qint64)), this, SLOT(goOnSend(qint64)));
+  QObject::connect(m_timer, &QTimer::timeout, this, &GorgZorg::onTimeout);
+  QObject::connect(m_tcpClient, &QTcpSocket::connected, this, &GorgZorg::send); // When the connection is successful, start to transfer files
+  QObject::connect(m_tcpClient, &QTcpSocket::bytesWritten, this, &GorgZorg::goOnSend);
+}
+
+void GorgZorg::onTimeout()
+{
+  //If after 5 seconds, there is no byte written, let's abort gorging...
+  if (m_byteToWrite == 0)
+  {
+    QTextStream qout(stdout);
+    qout << QLatin1String("ERROR: It seems there is no one zorging on %1:%2").arg(m_targetAddress).arg(m_port) << Qt::endl;
+    exit(1);
+  }
 }
 
 void GorgZorg::sendFile(const QString &filePath)
@@ -51,7 +66,7 @@ void GorgZorg::sendFile(const QString &filePath)
   }
 
   QEventLoop eventLoop;
-  QObject::connect(this, SIGNAL(endTransfer()), &eventLoop, SLOT(quit()));
+  QObject::connect(this, &GorgZorg::endTransfer, &eventLoop, &QEventLoop::quit);
   eventLoop.exec();
   qSleep(m_delay);
 }
@@ -66,12 +81,14 @@ void GorgZorg::connectAndSend(const QString &targetAddress, const QString &pathT
 
   if (fi.isFile())
   {
+    m_timer->start(5000);
     sendFile(pathToGorg);
   }
   else
   {
     if (m_tarContents)
     {
+      m_timer->start(5000);
       quint32 gen = QRandomGenerator::global()->generate();
       QString taredFile = QLatin1String("gorged_%1.tar").arg(QString::number(gen));
 
@@ -86,6 +103,7 @@ void GorgZorg::connectAndSend(const QString &targetAddress, const QString &pathT
     }
     else
     {
+      m_timer->start(5000);
       //Loop thru the files in the pathToGorg
       QDirIterator it(pathToGorg, QDir::AllEntries | QDir::Hidden | QDir::System, QDirIterator::Subdirectories);
       while (it.hasNext())
@@ -196,7 +214,7 @@ void GorgZorg::acceptConnection()
   qout << Qt::endl << QLatin1String("Connected, preparing to receive files!");
 
   m_receivedSocket = m_server->nextPendingConnection();
-  QObject::connect(m_receivedSocket, SIGNAL(readyRead()), this, SLOT (readClient()));
+  QObject::connect(m_receivedSocket, &QTcpSocket::readyRead, this, &GorgZorg::readClient);
 }
 
 void GorgZorg::readClient()
@@ -304,7 +322,7 @@ void GorgZorg::startServer(const QString &ipAddress)
     exit(1);
   }
 
-  QObject::connect(m_server, SIGNAL(newConnection()), this, SLOT(acceptConnection()));
+  QObject::connect(m_server, &QTcpServer::newConnection, this, &GorgZorg::acceptConnection);
 
   qout << QLatin1String("Start zorging on %1:%2...").arg(ip).arg(m_port) << Qt::endl;
 }
