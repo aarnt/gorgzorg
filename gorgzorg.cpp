@@ -66,7 +66,7 @@ GorgZorg::GorgZorg()
 void GorgZorg::onTimeout()
 {
   //If after 5 seconds, there is no byte written, let's abort gorging...
-  if (m_byteToWrite == 0)
+  if (m_totalSize == 0)
   {
     if (m_tarContents) //If there is an archived file that was not sent, let's remove it
     {
@@ -117,16 +117,16 @@ void GorgZorg::connectAndSend(const QString &targetAddress, const QString &pathT
     exit(1);
   }
 
+  m_timer->start(3000);
+
   if (fi.isFile())
   {
-    m_timer->start(5000);
     sendFile(pathToGorg);
   }
   else
   {
     if (m_tarContents)
     {
-      m_timer->start(5000);
       quint32 gen = QRandomGenerator::global()->generate();
       m_archiveFileName = QLatin1String("gorged_%1.tar").arg(QString::number(gen));
 
@@ -141,8 +141,6 @@ void GorgZorg::connectAndSend(const QString &targetAddress, const QString &pathT
     }
     else
     {
-      m_timer->start(5000);
-
       //Loop thru the files in the pathToGorg
       QDirIterator it(pathToGorg, QDir::AllEntries | QDir::Hidden | QDir::System, QDirIterator::Subdirectories);
       while (it.hasNext())
