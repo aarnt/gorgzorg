@@ -194,8 +194,8 @@ void GorgZorg::send()
 
   if (m_sendingADir)
   {
-    m_byteToWrite = 0; //m_loadSize;
-    m_totalSize = 0; //m_loadSize;
+    m_byteToWrite = 0;
+    m_totalSize = 0;
   }
   else
   {
