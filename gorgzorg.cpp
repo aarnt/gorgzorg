@@ -216,8 +216,10 @@ void GorgZorg::readClient()
     qout << Qt::endl << QLatin1String("Zorging %1").arg(m_currentFileName) << Qt::endl;
     //currentPath.remove(".");
 
-    if (!m_currentPath.isEmpty() && m_currentPath != "./")
+    if (!m_currentPath.isEmpty()) //&& m_currentPath != "./")
     {
+      m_currentPath.remove("../");
+      m_currentPath.remove("./");
       QProcess p;
       QStringList params;
       params << QLatin1String("-p");
