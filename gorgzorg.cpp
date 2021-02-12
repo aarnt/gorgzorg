@@ -52,7 +52,7 @@ GorgZorg::GorgZorg()
   m_targetAddress = "";
   m_delay = 100;
   m_port = 10000;
-  m_timer = new QTimer(this);
+  m_timer = new QTimer(this); // This timer controls if there is someone listening on the other side
   m_timer->setSingleShot(true);
   m_tarContents = false;
 
@@ -93,6 +93,9 @@ void GorgZorg::sendFile(const QString &filePath)
 
 /*
  * Threaded methods to connect and send data to client
+ *
+ * It can send just one file or entire paths (with subpaths)
+ * When sending paths, it can archive them with tar before sending
  */
 void GorgZorg::connectAndSend(const QString &targetAddress, const QString &pathToGorg)
 {
@@ -131,6 +134,7 @@ void GorgZorg::connectAndSend(const QString &targetAddress, const QString &pathT
     else
     {
       m_timer->start(5000);
+
       //Loop thru the files in the pathToGorg
       QDirIterator it(pathToGorg, QDir::AllEntries | QDir::Hidden | QDir::System, QDirIterator::Subdirectories);
       while (it.hasNext())
@@ -192,9 +196,8 @@ void GorgZorg::send()
 
   m_tcpClient->write(m_outBlock); // Send the read file to the socket
 
-  /*ui->progressLabel->show ();
-  ui->sendProgressBar->setMaximum(totalSize);
-  ui->sendProgressBar->setValue(totalSize-byteToWrite);*/
+  //ui->sendProgressBar->setMaximum(totalSize);
+  //ui->sendProgressBar->setValue(totalSize-byteToWrite);
 }
 
 void GorgZorg::goOnSend(qint64 numBytes) // Start sending file content
@@ -203,8 +206,8 @@ void GorgZorg::goOnSend(qint64 numBytes) // Start sending file content
   m_outBlock = m_localFile->read(qMin(m_byteToWrite, m_loadSize));
   m_tcpClient->write(m_outBlock);
 
-  //ui-> sendProgressBar-> setMaximum (totalSize);
-  //ui-> sendProgressBar-> setValue (totalSize-byteToWrite);
+  //ui-> sendProgressBar->setMaximum(totalSize);
+  //ui-> sendProgressBar->setValue(totalSize-byteToWrite);
 
   if (m_byteToWrite == 0) // Send completed
   {
@@ -257,7 +260,6 @@ void GorgZorg::readClient()
     m_currentPath = m_fileName.left(m_fileName.size()-cutName);
 
     qout << Qt::endl << QLatin1String("Zorging %1").arg(m_currentFileName) << Qt::endl;
-    //currentPath.remove(".");
 
     if (!m_currentPath.isEmpty()) //&& m_currentPath != "./")
     {
@@ -281,8 +283,8 @@ void GorgZorg::readClient()
     m_newFile->flush();
   }
 
-  //ui-> receivedProgressBar-> setMaximum (totalSize);
-  //ui-> receivedProgressBar-> setValue (byteReceived);
+  //ui-> receivedProgressBar->setMaximum(totalSize);
+  //ui-> receivedProgressBar->setValue(byteReceived);
 
   if (m_byteReceived == m_totalSize)
   {
