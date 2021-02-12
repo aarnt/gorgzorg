@@ -68,6 +68,12 @@ void GorgZorg::onTimeout()
   //If after 5 seconds, there is no byte written, let's abort gorging...
   if (m_byteToWrite == 0)
   {
+    if (m_tarContents) //If there is an archived file that was not sent, let's remove it
+    {
+      if (QFile::exists(m_archiveFileName))
+        QFile::remove(m_archiveFileName);
+    }
+
     QTextStream qout(stdout);
     qout << QLatin1String("ERROR: It seems there is no one zorging on %1:%2").arg(m_targetAddress).arg(m_port) << Qt::endl;
     exit(1);
@@ -122,16 +128,16 @@ void GorgZorg::connectAndSend(const QString &targetAddress, const QString &pathT
     {
       m_timer->start(5000);
       quint32 gen = QRandomGenerator::global()->generate();
-      QString taredFile = QLatin1String("gorged_%1.tar").arg(QString::number(gen));
+      m_archiveFileName = QLatin1String("gorged_%1.tar").arg(QString::number(gen));
 
       QProcess tar;
       QStringList params;
       params << QLatin1String("-cf");
-      params << taredFile;
+      params << m_archiveFileName;
       params << pathToGorg;
       tar.execute(QLatin1String("tar"), params);
 
-      sendFile(taredFile);
+      sendFile(m_archiveFileName);
     }
     else
     {
@@ -300,7 +306,7 @@ void GorgZorg::readClient()
     m_currentPath = m_fileName.left(m_fileName.size()-cutName);
     m_receivingADir = false;
 
-    //dir:directory/subdirectory
+    //ctn_DIR_ESCAPEdirectory/subdirectory
     if (m_currentPath.startsWith(ctn_DIR_ESCAPE))
     {
       m_receivingADir = true;

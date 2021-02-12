@@ -41,12 +41,17 @@ public:
 
 private:
   QTcpSocket *m_tcpClient;
+  QTcpServer *m_server;
+  QTcpSocket *m_receivedSocket;
+  QByteArray m_outBlock;
+  QByteArray m_inBlock;
   QFile *m_localFile;
   QFile *m_newFile;
   QString m_fileName;
   QString m_currentPath;
   QString m_currentFileName;
   QString m_targetAddress;
+  QString m_archiveFileName; //Contains the random generated name of the archived path to send
   QTimer *m_timer;
 
   int m_delay;
@@ -54,11 +59,6 @@ private:
   bool m_tarContents;
   bool m_sendingADir;
   bool m_receivingADir;
-
-  QTcpServer *m_server;
-  QTcpSocket *m_receivedSocket;
-  QByteArray m_outBlock;
-  QByteArray m_inBlock;
   qint64 m_loadSize;      //The size of each send data
   qint64 m_byteToWrite;   //The remaining data size
   qint64 m_byteReceived;  //The size that has been sent
