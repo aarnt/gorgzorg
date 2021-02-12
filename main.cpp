@@ -19,7 +19,6 @@
 */
 
 #include <QCoreApplication>
-#include <QDirIterator>
 #include <QTextStream>
 
 #include "gorgzorg.h"
@@ -29,7 +28,6 @@ int main(int argc, char *argv[])
 {
   QCoreApplication a(argc, argv);
   ArgumentList *argList = new ArgumentList(argc, argv);
-
   GorgZorg gz;
   QString target;
   QString pathToGorg;

@@ -251,7 +251,7 @@ void GorgZorg::readClient()
 
   if (m_byteReceived == 0) // just started to receive data, this data is file information
   {
-    //ui-> receivedProgressBar-> setValue (0);
+    //ui->receivedProgressBar->setValue(0);
     QDataStream in(m_receivedSocket);
     in >> m_totalSize >> m_byteReceived >> m_fileName;
 
