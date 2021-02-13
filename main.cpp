@@ -60,20 +60,22 @@ int main(int argc, char *argv[])
   {
     aux = argList->getSwitchArg(QLatin1String("-z"));
 
-    if (!GorgZorg::isValidIP(aux))
+    if (!aux.isEmpty())
     {
-      qout << QLatin1String("ERROR: Your are trying to listen on an invalid IPv4 IP!") << Qt::endl;
-      exit(1);
-    }
+      if (!GorgZorg::isValidIP(aux))
+      {
+        qout << QLatin1String("ERROR: Your are trying to listen on an invalid IPv4 IP!") << Qt::endl;
+        exit(1);
+      }
 
-    if (!aux.isEmpty() &&
-        !aux.startsWith(QLatin1String("10.0")) &&
+      if (!aux.startsWith(QLatin1String("10.0")) &&
         !aux.startsWith(QLatin1String("127.0.0")) &&
         !aux.startsWith(QLatin1String("172.16")) &&
         !aux.startsWith(QLatin1String("192.168")))
-    {
-      qout << QLatin1String("ERROR: GorgZorg can only run on a local network!") << Qt::endl;
-      exit(1);
+      {
+        qout << QLatin1String("ERROR: GorgZorg can only run on a local network!") << Qt::endl;
+        exit(1);
+      }
     }
 
     gz.startServer(aux);
