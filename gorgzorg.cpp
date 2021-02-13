@@ -67,6 +67,7 @@ GorgZorg::GorgZorg()
 bool GorgZorg::isValidIP(const QString &ip)
 {
   bool res = false;
+
   if (ip == "0.0.0.0" || ip == "255.255.255.255")
     return res;
 
@@ -81,14 +82,21 @@ bool GorgZorg::isValidIP(const QString &ip)
     int oc3 = rem.captured(3).toInt(&ok);
     int oc4 = rem.captured(4).toInt(&ok);
 
-    if ((oc1 >= 0 && oc1 <= 255) &&
-      (oc2 >= 0 && oc2 <= 255) &&
-      (oc3 >= 0 && oc3 <= 255) &&
-      (oc4 >= 0 && oc4 <= 255))
+    if ((oc1 >= 0 && oc1 <= 255) && (oc2 >= 0 && oc2 <= 255) &&
+      (oc3 >= 0 && oc3 <= 255) && (oc4 >= 0 && oc4 <= 255))
       res = true;
   }
 
   return res;
+}
+
+bool GorgZorg::isLocalIP(const QString &ip)
+{
+  if (ip.startsWith("10.0") || ip.startsWith("127.0.0") ||
+      ip.startsWith("172.16") || ip.startsWith("192.168"))
+    return true;
+  else
+    return false;
 }
 
 void GorgZorg::onTimeout()
@@ -448,7 +456,7 @@ void GorgZorg::startServer(const QString &ipAddress)
   if (!m_server->listen(QHostAddress(ip), m_port))
   {
     //If we could not bind to this port...
-    qout << QString("ERROR: Port %1 is already being used in this host!").arg(m_port) << Qt::endl;
+    qout << QString("ERROR: %1 is not an available IP or port %2 is already being used in this host!").arg(ip).arg(m_port) << Qt::endl;
     exit(1);
   }
 

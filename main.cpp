@@ -68,10 +68,7 @@ int main(int argc, char *argv[])
         exit(1);
       }
 
-      if (!aux.startsWith(QLatin1String("10.0")) &&
-        !aux.startsWith(QLatin1String("127.0.0")) &&
-        !aux.startsWith(QLatin1String("172.16")) &&
-        !aux.startsWith(QLatin1String("192.168")))
+      if (!GorgZorg::isLocalIP(aux))
       {
         qout << QLatin1String("ERROR: GorgZorg can only run on a local network!") << Qt::endl;
         exit(1);
@@ -99,10 +96,7 @@ int main(int argc, char *argv[])
         exit(1);
       }
 
-      if (!target.startsWith("10.0") &&
-          !target.startsWith("127.0.0") &&
-          !target.startsWith("172.16") &&
-          !target.startsWith("192.168"))
+      if (!GorgZorg::isLocalIP(target))
       {
         qout << QLatin1String("ERROR: GorgZorg can only run on a local network!") << Qt::endl;
         exit(1);

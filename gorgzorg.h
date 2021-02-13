@@ -80,6 +80,8 @@ public:
   void startServer(const QString &ipAddress = "");
   void showHelp();
   static bool isValidIP(const QString &ip);
+  static bool isLocalIP(const QString &ip);
+
   inline void setDelay(int delay) { m_delay = delay; }
   inline void setPort(int port) { m_port = port; }
   inline void setTarContents() { m_tarContents = true; }
