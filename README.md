@@ -30,7 +30,6 @@ $make
     -h: Show this help
     -v: Verbose mode. When gorging, show speed. When zorging, show bytes received
     -c <IP>: Set IP or name to connect to
-    -d <ms>: Set delay to wait between file transfers (in ms, default is 100)
     -tar: Use tar to archive contents of relative path
     -g <relativepath>: Set a relative filename or relative path to gorg (send)
     -p <portnumber>: Set port to connect or listen to connections (default is 10000)

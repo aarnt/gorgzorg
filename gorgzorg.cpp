@@ -150,7 +150,7 @@ void GorgZorg::sendFile(const QString &filePath)
   QObject::connect(this, &GorgZorg::endTransfer, &eventLoop, &QEventLoop::quit);
   eventLoop.exec();
 
-  qSleep(m_delay);
+  //qSleep(m_delay);
 }
 
 QString GorgZorg::createArchive(const QString &pathToArchive)
@@ -525,7 +525,7 @@ void GorgZorg::showHelp()
   qout << Qt::endl << QLatin1String("    -h: Show this help") << Qt::endl;
   qout << QLatin1String("    -v: Verbose mode. When gorging, show speed. When zorging, show bytes received") << Qt::endl;
   qout << QLatin1String("    -c <IP>: Set IP or name to connect to") << Qt::endl;
-  qout << QLatin1String("    -d <ms>: Set delay to wait between file transfers (in ms, default is 100)") << Qt::endl;
+  //qout << QLatin1String("    -d <ms>: Set delay to wait between file transfers (in ms, default is 100)") << Qt::endl;
   qout << QLatin1String("    -tar: Use tar to archive contents of relative path") << Qt::endl;
   qout << QLatin1String("    -g <relativepath>: Set a relative filename or relative path to gorg (send)") << Qt::endl;
   qout << QLatin1String("    -p <portnumber>: Set port to connect or listen to connections (default is 10000)") << Qt::endl;
