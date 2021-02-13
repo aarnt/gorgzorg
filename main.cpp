@@ -28,6 +28,7 @@ int main(int argc, char *argv[])
 {
   QCoreApplication a(argc, argv);
   ArgumentList *argList = new ArgumentList(argc, argv);
+
   GorgZorg gz;
   QString target;
   QString pathToGorg;
@@ -59,6 +60,12 @@ int main(int argc, char *argv[])
   {
     aux = argList->getSwitchArg(QLatin1String("-z"));
 
+    if (!GorgZorg::isValidIP(aux))
+    {
+      qout << QLatin1String("ERROR: Your are trying to listen on an invalid IPv4 IP!") << Qt::endl;
+      exit(1);
+    }
+
     if (!aux.isEmpty() &&
         !aux.startsWith(QLatin1String("10.0")) &&
         !aux.startsWith(QLatin1String("127.0.0")) &&
@@ -83,6 +90,13 @@ int main(int argc, char *argv[])
     if (!aux.isEmpty())
     {
       target=aux;
+
+      if (!GorgZorg::isValidIP(aux))
+      {
+        qout << QLatin1String("ERROR: Your are trying to connect to an invalid IPv4 IP!") << Qt::endl;
+        exit(1);
+      }
+
       if (!target.startsWith("10.0") &&
           !target.startsWith("127.0.0") &&
           !target.startsWith("172.16") &&

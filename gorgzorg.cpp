@@ -34,6 +34,7 @@
 #include <QEventLoop>
 #include <QNetworkInterface>
 #include <QRandomGenerator>
+#include <QRegularExpression>
 #include <QTimer>
 
 void qSleep(int ms)
@@ -61,6 +62,33 @@ GorgZorg::GorgZorg()
   QObject::connect(m_timer, &QTimer::timeout, this, &GorgZorg::onTimeout);
   QObject::connect(m_tcpClient, &QTcpSocket::connected, this, &GorgZorg::send); // When the connection is successful, start to transfer files
   QObject::connect(m_tcpClient, &QTcpSocket::bytesWritten, this, &GorgZorg::goOnSend);
+}
+
+bool GorgZorg::isValidIP(const QString &ip)
+{
+  bool res = false;
+  if (ip == "0.0.0.0" || ip == "255.255.255.255")
+    return res;
+
+  QRegularExpression re("^(\\d+).(\\d+).(\\d+).(\\d+)$");
+  QRegularExpressionMatch rem = re.match(ip);
+
+  if (rem.hasMatch())
+  {
+    bool ok;
+    int oc1 = rem.captured(1).toInt(&ok);
+    int oc2 = rem.captured(2).toInt(&ok);
+    int oc3 = rem.captured(3).toInt(&ok);
+    int oc4 = rem.captured(4).toInt(&ok);
+
+    if ((oc1 >= 0 && oc1 <= 255) &&
+      (oc2 >= 0 && oc2 <= 255) &&
+      (oc3 >= 0 && oc3 <= 255) &&
+      (oc4 >= 0 && oc4 <= 255))
+      res = true;
+  }
+
+  return res;
 }
 
 void GorgZorg::onTimeout()
