@@ -169,12 +169,12 @@ void GorgZorg::connectAndSend(const QString &targetAddress, const QString &pathT
     }
     else
     {
-      //Loop thru the files in the pathToGorg
+      //Loop thru the dirs/files on pathToGorg
       QDirIterator it(pathToGorg, QDir::AllEntries | QDir::Hidden | QDir::System, QDirIterator::Subdirectories);
       while (it.hasNext())
       {
         QString traverse = it.next();
-        if (traverse.endsWith(QLatin1String(".")) || traverse.endsWith(QLatin1String("..")) /*|| it.fileInfo().isDir()*/) continue;
+        if (traverse.endsWith(QLatin1String(".")) || traverse.endsWith(QLatin1String(".."))) continue;
 
         if (it.fileInfo().isDir())
           traverse = ctn_DIR_ESCAPE + traverse;
