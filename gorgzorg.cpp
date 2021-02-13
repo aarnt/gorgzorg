@@ -400,6 +400,9 @@ void GorgZorg::readClient()
       m_newFile->open(QFile :: WriteOnly);
       m_inBlock = m_receivedSocket->readAll();
       m_byteReceived += m_inBlock.size();
+
+      m_newFile->write(m_inBlock);  // test code
+      m_newFile->flush();           // test code
     }
 
     if (m_verbose) qout << QLatin1String("Received %1 bytes of %2").arg(QString::number(m_byteReceived)).arg(QString::number(m_totalSize)) << Qt::endl;
