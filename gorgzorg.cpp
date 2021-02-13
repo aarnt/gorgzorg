@@ -36,6 +36,7 @@
 #include <QRandomGenerator>
 #include <QRegularExpression>
 #include <QTimer>
+#include <QElapsedTimer>
 
 void qSleep(int ms)
 {
@@ -52,15 +53,17 @@ GorgZorg::GorgZorg()
   QTextCodec::setCodecForLocale(QTextCodec::codecForName ("GBK"));
   m_tcpClient = new QTcpSocket (this);
   m_sendTimes = 0;
+  m_totalSent = 0;
   m_targetAddress = "";
   m_delay = 100;
   m_port = 10000;
-  m_timer = new QTimer(this); // This timer controls if there is someone listening on the other side
-  m_timer->setSingleShot(true);
+  m_connectionTimer = new QTimer(this); // This timer controls if there is someone listening on the other side
+  m_timer = new QElapsedTimer();
+  m_connectionTimer->setSingleShot(true);
   m_tarContents = false;
   m_verbose = false;
 
-  QObject::connect(m_timer, &QTimer::timeout, this, &GorgZorg::onTimeout);
+  QObject::connect(m_connectionTimer, &QTimer::timeout, this, &GorgZorg::onTimeout);
   QObject::connect(m_tcpClient, &QTcpSocket::connected, this, &GorgZorg::send); // When the connection is successful, start to transfer files
   QObject::connect(m_tcpClient, &QTcpSocket::bytesWritten, this, &GorgZorg::goOnSend);
 }
@@ -170,7 +173,8 @@ void GorgZorg::connectAndSend(const QString &targetAddress, const QString &pathT
     exit(1);
   }
 
-  m_timer->start(3000);
+  m_connectionTimer->start(3000);
+  if (m_verbose) m_timer->start();
 
   if (fi.isFile())
   {
@@ -204,6 +208,20 @@ void GorgZorg::connectAndSend(const QString &targetAddress, const QString &pathT
         sendFile(traverse);
       }
     }
+  }
+
+  if (m_verbose)
+  {
+    double duration = m_timer->elapsed() / 1000.0; //duration of send in seconds
+    double bytesSent = (m_totalSent / 1024.0) / 1024.0;
+    double speed = bytesSent / duration;
+    QString strDuration = QString::number(duration, 'f', 2);
+    QString strBytesSent = QString::number(bytesSent, 'f', 2);
+    QString strSpeed = QString::number(speed, 'f', 2);
+
+    qout << QLatin1String("Time elapsed: %1s").arg(strDuration) << Qt::endl;
+    qout << QLatin1String("Bytes sent: %1 MB").arg(strBytesSent) << Qt::endl;
+    qout << QLatin1String("Speed: %1 MB/s").arg(strSpeed) << Qt::endl;
   }
 
   qout << Qt::endl;
@@ -255,6 +273,7 @@ void GorgZorg::send()
   {
     m_byteToWrite = m_localFile->size(); //The size of the remaining data
     m_totalSize = m_localFile->size();
+    m_totalSent += m_totalSize;
   }
 
   QDataStream out(&m_outBlock, QIODevice::WriteOnly);
@@ -273,8 +292,9 @@ void GorgZorg::send()
 
   out << qint64 (0) << qint64 (0) << m_currentFileName;
 
-  m_totalSize += m_outBlock.size (); // The total size is the file size plus the size of the file name and other information
-  m_byteToWrite += m_outBlock.size ();
+  m_totalSize += m_outBlock.size(); // The total size is the file size plus the size of the file name and other information
+  m_byteToWrite += m_outBlock.size();
+  m_totalSent += m_outBlock.size();
 
   out.device()->seek(0); // Go back to the beginning of the byte stream to write a qint64 in front, which is the total size and file name and other information size
   out << m_totalSize << qint64(m_outBlock.size ());
@@ -444,7 +464,6 @@ void GorgZorg::startServer(const QString &ipAddress)
   m_totalSize = 0;
   m_byteReceived = 0;
   m_server = new QTcpServer(this);
-  //m_server->setMaxPendingConnections(1);
   QString ip = ipAddress;
   QTextStream qout(stdout);
 
@@ -492,6 +511,7 @@ void GorgZorg::showHelp()
 
   qout << Qt::endl << QLatin1String("  GorgZorg, a simple CLI network file transfer tool") << Qt::endl;
   qout << Qt::endl << QLatin1String("    -h: Show this help") << Qt::endl;
+  qout << QLatin1String("    -v: Verbose mode. When gorging, show speed. When zorging, show bytes received") << Qt::endl;
   qout << QLatin1String("    -c <IP>: Set IP or name to connect to") << Qt::endl;
   qout << QLatin1String("    -d <ms>: Set delay to wait between file transfers (in ms, default is 100)") << Qt::endl;
   qout << QLatin1String("    -tar: Use tar to archive contents of relative path") << Qt::endl;

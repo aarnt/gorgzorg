@@ -29,6 +29,7 @@ class QTcpSocket;
 class QTcpServer;
 class QFile;
 class QTimer;
+class QElapsedTimer;
 
 const QString ctn_VERSION="0.1";
 const QString ctn_DIR_ESCAPE="<^dir$>:";
@@ -52,7 +53,8 @@ private:
   QString m_currentFileName;
   QString m_targetAddress;
   QString m_archiveFileName; //Contains the random generated name of the archived path to send
-  QTimer *m_timer;
+  QTimer *m_connectionTimer;
+  QElapsedTimer *m_timer;    //Counts ms since starting sending files
 
   int m_delay;
   int m_port;
@@ -64,6 +66,7 @@ private:
   qint64 m_byteToWrite;   //The remaining data size
   qint64 m_byteReceived;  //The size that has been sent
   qint64 m_totalSize;     //Total file size
+  qint64 m_totalSent;     //Total bytes sent
   int m_sendTimes;        //Used to mark whether to send for the first time, after the first connection signal is triggered, followed by manually calling
 
   bool prepareToSendFile(const QString &fName);
@@ -81,7 +84,6 @@ public:
   void connectAndSend(const QString &targetAddress, const QString &pathToGorg);
   void startServer(const QString &ipAddress = "");
   void showHelp();
-
   static bool isValidIP(const QString &ip);
   static bool isLocalIP(const QString &ip);
 
