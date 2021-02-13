@@ -389,7 +389,6 @@ void GorgZorg::readClient()
 
       m_inBlock = m_receivedSocket->readAll();
       m_byteReceived += m_inBlock.size();
-      if (m_verbose) qout << QLatin1String("Received %1 bytes of %2").arg(QString::number(m_byteReceived)).arg(QString::number(m_totalSize)) << Qt::endl;
     }
     else
     {
@@ -402,6 +401,8 @@ void GorgZorg::readClient()
       m_inBlock = m_receivedSocket->readAll();
       m_byteReceived += m_inBlock.size();
     }
+
+    if (m_verbose) qout << QLatin1String("Received %1 bytes of %2").arg(QString::number(m_byteReceived)).arg(QString::number(m_totalSize)) << Qt::endl;
   }
   else // Officially read the file content
   {
