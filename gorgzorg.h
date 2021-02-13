@@ -76,6 +76,7 @@ private:
 private slots:
   void acceptConnection();
   void readClient();
+  void readResponse();
   void send();            //Transfer file header information
   void goOnSend(qint64);  //Transfer file contents
   void onTimeout();
@@ -84,6 +85,7 @@ public:
   void connectAndSend(const QString &targetAddress, const QString &pathToGorg);
   void startServer(const QString &ipAddress = "");
   void showHelp();
+
   static bool isValidIP(const QString &ip);
   static bool isLocalIP(const QString &ip);
 

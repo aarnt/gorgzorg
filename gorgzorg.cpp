@@ -65,7 +65,20 @@ GorgZorg::GorgZorg()
 
   QObject::connect(m_connectionTimer, &QTimer::timeout, this, &GorgZorg::onTimeout);
   QObject::connect(m_tcpClient, &QTcpSocket::connected, this, &GorgZorg::send); // When the connection is successful, start to transfer files
+  QObject::connect(m_tcpClient, &QTcpSocket::readyRead, this, &GorgZorg::readResponse);
   QObject::connect(m_tcpClient, &QTcpSocket::bytesWritten, this, &GorgZorg::goOnSend);
+}
+
+void GorgZorg::readResponse()
+{
+  QTextStream qout(stdout);
+
+  QString ret = m_tcpClient->readAll();
+  if (ret == "OK")
+  {
+    qout << QLatin1String("Zorged OK received") << Qt::endl;
+    emit endTransfer();
+  }
 }
 
 bool GorgZorg::isValidIP(const QString &ip)
@@ -347,7 +360,7 @@ void GorgZorg::goOnSend(qint64 numBytes) // Start sending file content
       m_localFile->close();
     }
 
-    emit endTransfer();
+    //emit endTransfer();
   }
 }
 
@@ -456,6 +469,9 @@ void GorgZorg::readClient()
 
     m_byteReceived = 0;
     m_totalSize = 0;
+
+    //Send an OK to the other side
+    m_receivedSocket->write("OK");
   }
 }
 
