@@ -59,6 +59,7 @@ private:
   bool m_tarContents;
   bool m_sendingADir;
   bool m_receivingADir;
+  bool m_verbose;
   qint64 m_loadSize;      //The size of each send data
   qint64 m_byteToWrite;   //The remaining data size
   qint64 m_byteReceived;  //The size that has been sent
@@ -85,6 +86,7 @@ public:
   inline void setDelay(int delay) { m_delay = delay; }
   inline void setPort(int port) { m_port = port; }
   inline void setTarContents() { m_tarContents = true; }
+  inline void setVerbose() { m_verbose = true; }
 
 signals:
   void endTransfer();

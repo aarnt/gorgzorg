@@ -57,7 +57,8 @@ GorgZorg::GorgZorg()
   m_port = 10000;
   m_timer = new QTimer(this); // This timer controls if there is someone listening on the other side
   m_timer->setSingleShot(true);
-  m_tarContents = false;
+  m_tarContents = true; //false;
+  m_verbose = false;
 
   QObject::connect(m_timer, &QTimer::timeout, this, &GorgZorg::onTimeout);
   QObject::connect(m_tcpClient, &QTcpSocket::connected, this, &GorgZorg::send); // When the connection is successful, start to transfer files
@@ -106,7 +107,7 @@ void GorgZorg::onTimeout()
   {
     if (m_tarContents) //If there is an archived file that was not sent, let's remove it
     {
-      if (QFile::exists(m_archiveFileName))
+      if (QFile::exists(m_archiveFileName) && m_archiveFileName.endsWith(".tar"))
         QFile::remove(m_archiveFileName);
     }
 
@@ -155,11 +156,11 @@ void GorgZorg::connectAndSend(const QString &targetAddress, const QString &pathT
 
   m_timer->start(3000);
 
-  if (fi.isFile())
+  /*if (fi.isFile())
   {
     sendFile(pathToGorg);
-  }
-  else
+  }*/
+  //else
   {
     if (m_tarContents)
     {
@@ -305,7 +306,7 @@ void GorgZorg::goOnSend(qint64 numBytes) // Start sending file content
       path.remove(QLatin1Char('\n'));
       path += QDir::separator() + m_currentFileName;
 
-      QFile::remove(path);
+      if (path.endsWith(".tar")) QFile::remove(path);
     }
 
     if (!m_sendingADir)
@@ -375,7 +376,7 @@ void GorgZorg::readClient()
 
       m_inBlock = m_receivedSocket->readAll();
       m_byteReceived += m_inBlock.size();
-      //qout << QLatin1String("Received %1 bytes of %2").arg(QString::number(m_byteReceived)).arg(QString::number(m_totalSize)) << Qt::endl;
+      if (m_verbose) qout << QLatin1String("Received %1 bytes of %2").arg(QString::number(m_byteReceived)).arg(QString::number(m_totalSize)) << Qt::endl;
     }
     else
     {
@@ -393,7 +394,7 @@ void GorgZorg::readClient()
   {
     m_inBlock = m_receivedSocket->readAll();
     m_byteReceived += m_inBlock.size();
-    //qout << QLatin1String("Received again %1 bytes of %2").arg(QString::number(m_byteReceived)).arg(QString::number(m_totalSize)) << Qt::endl;
+    if (m_verbose) qout << QLatin1String("Received again %1 bytes of %2").arg(QString::number(m_byteReceived)).arg(QString::number(m_totalSize)) << Qt::endl;
 
     if (!m_receivingADir)
     {
