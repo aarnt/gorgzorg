@@ -55,8 +55,8 @@ GorgZorg::GorgZorg()
   m_sendTimes = 0;
   m_totalSent = 0;
   m_targetAddress = "";
-  m_delay = 100;
   m_port = 10000;
+  //m_delay = 100; //ms
   m_connectionTimer = new QTimer(this); // This timer controls if there is someone listening on the other side
   m_timer = new QElapsedTimer();
   m_connectionTimer->setSingleShot(true);
@@ -149,8 +149,6 @@ void GorgZorg::sendFile(const QString &filePath)
   QEventLoop eventLoop;
   QObject::connect(this, &GorgZorg::endTransfer, &eventLoop, &QEventLoop::quit);
   eventLoop.exec();
-
-  //qSleep(m_delay);
 }
 
 QString GorgZorg::createArchive(const QString &pathToArchive)

@@ -28,7 +28,6 @@ int main(int argc, char *argv[])
 {
   QCoreApplication a(argc, argv);
   ArgumentList *argList = new ArgumentList(argc, argv);
-
   GorgZorg gz;
   QString target;
   QString pathToGorg;
@@ -108,23 +107,6 @@ int main(int argc, char *argv[])
     {
       qout << QLatin1String("ERROR: You should specify an IP to connect to!") << Qt::endl;
       exit(1);
-    }
-
-    aux = argList->getSwitchArg("-d");
-    if (!aux.isEmpty())
-    {
-      bool ok;
-      int delay = aux.toInt(&ok);
-
-      if (delay != 0)
-      {
-        gz.setDelay(delay);
-      }
-      else
-      {
-        qout << QLatin1String("ERROR: You should specify a delay value!") << Qt::endl;
-        exit(1);
-      }
     }
 
     //Checks if the user wants path to be "tared"

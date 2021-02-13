@@ -56,7 +56,7 @@ private:
   QTimer *m_connectionTimer;
   QElapsedTimer *m_timer;    //Counts ms since starting sending files
 
-  int m_delay;
+  //int m_delay;
   int m_port;
   bool m_tarContents;
   bool m_sendingADir;
@@ -89,7 +89,7 @@ public:
   static bool isValidIP(const QString &ip);
   static bool isLocalIP(const QString &ip);
 
-  inline void setDelay(int delay) { m_delay = delay; }
+  //inline void setDelay(int delay) { m_delay = delay; }
   inline void setPort(int port) { m_port = port; }
   inline void setTarContents() { m_tarContents = true; }
   inline void setVerbose() { m_verbose = true; }
