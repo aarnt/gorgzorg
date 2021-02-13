@@ -51,7 +51,7 @@ GorgZorg::GorgZorg()
 {
   QTextCodec::setCodecForLocale(QTextCodec::codecForName ("GBK"));
   m_tcpClient = new QTcpSocket (this);
-  m_sendTimes = 0;  
+  m_sendTimes = 0;
   m_targetAddress = "";
   m_delay = 100;
   m_port = 10000;
@@ -414,7 +414,6 @@ void GorgZorg::readClient()
 
     if (!m_receivingADir)
     {
-      m_newFile->flush();
       m_newFile->close();
     }
 
@@ -428,7 +427,7 @@ void GorgZorg::startServer(const QString &ipAddress)
   m_totalSize = 0;
   m_byteReceived = 0;
   m_server = new QTcpServer(this);
-  m_server->setMaxPendingConnections(1);
+  //m_server->setMaxPendingConnections(1);
   QString ip = ipAddress;
   QTextStream qout(stdout);
 
