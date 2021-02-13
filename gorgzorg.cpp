@@ -414,6 +414,7 @@ void GorgZorg::readClient()
 
     if (!m_receivingADir)
     {
+      m_newFile->flush();
       m_newFile->close();
     }
 
