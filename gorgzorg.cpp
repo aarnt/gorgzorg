@@ -219,7 +219,7 @@ void GorgZorg::connectAndSend(const QString &targetAddress, const QString &pathT
     QString strBytesSent = QString::number(bytesSent, 'f', 2);
     QString strSpeed = QString::number(speed, 'f', 2);
 
-    qout << QLatin1String("Time elapsed: %1s").arg(strDuration) << Qt::endl;
+    qout << Qt::endl << QLatin1String("Time elapsed: %1s").arg(strDuration) << Qt::endl;
     qout << QLatin1String("Bytes sent: %1 MB").arg(strBytesSent) << Qt::endl;
     qout << QLatin1String("Speed: %1 MB/s").arg(strSpeed) << Qt::endl;
   }
