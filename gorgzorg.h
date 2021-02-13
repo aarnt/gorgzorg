@@ -67,6 +67,7 @@ private:
   int m_sendTimes;        //Used to mark whether to send for the first time, after the first connection signal is triggered, followed by manually calling
 
   bool prepareToSendFile(const QString &fName);
+  QString createArchive(const QString &pathToArchive);
   void sendFile(const QString &filePath);
 
 private slots:
@@ -80,6 +81,7 @@ public:
   void connectAndSend(const QString &targetAddress, const QString &pathToGorg);
   void startServer(const QString &ipAddress = "");
   void showHelp();
+
   static bool isValidIP(const QString &ip);
   static bool isLocalIP(const QString &ip);
 

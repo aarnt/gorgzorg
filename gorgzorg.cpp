@@ -137,6 +137,21 @@ void GorgZorg::sendFile(const QString &filePath)
   qSleep(m_delay);
 }
 
+QString GorgZorg::createArchive(const QString &pathToArchive)
+{
+  quint32 gen = QRandomGenerator::global()->generate();
+  QString archiveFileName = QLatin1String("gorged_%1.tar").arg(QString::number(gen));
+
+  QProcess tar;
+  QStringList params;
+  params << QLatin1String("-cf");
+  params << archiveFileName;
+  params << pathToArchive;
+  tar.execute(QLatin1String("tar"), params);
+
+  return archiveFileName;
+}
+
 /*
  * Threaded methods to connect and send data to client
  *
@@ -159,22 +174,19 @@ void GorgZorg::connectAndSend(const QString &targetAddress, const QString &pathT
 
   if (fi.isFile())
   {
-    sendFile(pathToGorg);
+    if (m_tarContents)
+    {
+      m_archiveFileName = createArchive(pathToGorg);
+      sendFile(m_archiveFileName);
+    }
+    else
+      sendFile(pathToGorg);
   }
   else
   {
     if (m_tarContents)
     {
-      quint32 gen = QRandomGenerator::global()->generate();
-      m_archiveFileName = QLatin1String("gorged_%1.tar").arg(QString::number(gen));
-
-      QProcess tar;
-      QStringList params;
-      params << QLatin1String("-cf");
-      params << m_archiveFileName;
-      params << pathToGorg;
-      tar.execute(QLatin1String("tar"), params);
-
+      m_archiveFileName = createArchive(pathToGorg);
       sendFile(m_archiveFileName);
     }
     else

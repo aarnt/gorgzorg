@@ -56,9 +56,7 @@ int main(int argc, char *argv[])
       gz.setPort(port);
   }
 
-  aux = argList->getSwitch("-v");
-  if (!aux.isEmpty())
-    gz.setVerbose();
+  if (argList->getSwitch("-v")) gz.setVerbose();
 
   if (argList->contains(QLatin1String("-z")))
   {
