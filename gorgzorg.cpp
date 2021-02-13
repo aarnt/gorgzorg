@@ -57,7 +57,7 @@ GorgZorg::GorgZorg()
   m_port = 10000;
   m_timer = new QTimer(this); // This timer controls if there is someone listening on the other side
   m_timer->setSingleShot(true);
-  m_tarContents = true; //false;
+  m_tarContents = false;
   m_verbose = false;
 
   QObject::connect(m_timer, &QTimer::timeout, this, &GorgZorg::onTimeout);
@@ -133,6 +133,7 @@ void GorgZorg::sendFile(const QString &filePath)
   QEventLoop eventLoop;
   QObject::connect(this, &GorgZorg::endTransfer, &eventLoop, &QEventLoop::quit);
   eventLoop.exec();
+
   qSleep(m_delay);
 }
 
@@ -156,11 +157,11 @@ void GorgZorg::connectAndSend(const QString &targetAddress, const QString &pathT
 
   m_timer->start(3000);
 
-  /*if (fi.isFile())
+  if (fi.isFile())
   {
     sendFile(pathToGorg);
-  }*/
-  //else
+  }
+  else
   {
     if (m_tarContents)
     {
