@@ -474,11 +474,7 @@ void GorgZorg::startServer(const QString &ipAddress)
     {
       if (address.protocol() == QAbstractSocket::IPv4Protocol && address != localhost)
       {
-        if (!address.toString().startsWith("10.0") &&
-          !address.toString().startsWith("127.0.0") &&
-          !address.toString().startsWith("172.16") &&
-          !address.toString().startsWith("192.168")) continue;
-
+        if (!isLocalIP(address.toString())) continue;
         ip = address.toString();
       }
     }
