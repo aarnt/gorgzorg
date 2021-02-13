@@ -456,7 +456,7 @@ void GorgZorg::startServer(const QString &ipAddress)
   if (!m_server->listen(QHostAddress(ip), m_port))
   {
     //If we could not bind to this port...
-    qout << QString("ERROR: %1 is not an available IP or port %2 is already being used in this host!").arg(ip).arg(m_port) << Qt::endl;
+    qout << QString("ERROR: %1 is unavailable or port %2 is already being used in this host!").arg(ip).arg(m_port) << Qt::endl;
     exit(1);
   }
 
