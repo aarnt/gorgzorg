@@ -74,7 +74,7 @@ void GorgZorg::readResponse()
   QTextStream qout(stdout);
 
   QString ret = m_tcpClient->readAll();
-  if (ret == "OK")
+  if (ret == ctn_ZORGED_OK)
   {
     qout << QLatin1String("Zorged OK received") << Qt::endl;
     emit endTransfer();
@@ -491,7 +491,7 @@ void GorgZorg::readClient()
     m_totalSize = 0;
 
     //Send an OK to the other side
-    m_receivedSocket->write("OK");
+    m_receivedSocket->write(ctn_ZORGED_OK.toLatin1());
   }
 }
 

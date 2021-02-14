@@ -31,8 +31,9 @@ class QFile;
 class QTimer;
 class QElapsedTimer;
 
-const QString ctn_VERSION="0.1";
-const QString ctn_DIR_ESCAPE="<^dir$>:";
+const QString ctn_VERSION = "0.1";
+const QString ctn_DIR_ESCAPE = "<^dir$>:";
+const QString ctn_ZORGED_OK = "Z_OK";
 
 class GorgZorg: public QObject
 {
@@ -86,7 +87,6 @@ public:
   void connectAndSend(const QString &targetAddress, const QString &pathToGorg);
   void startServer(const QString &ipAddress = "");
   void showHelp();
-
   static bool isValidIP(const QString &ip);
   static bool isLocalIP(const QString &ip);
 
