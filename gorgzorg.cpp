@@ -547,6 +547,7 @@ void GorgZorg::showHelp()
   qout << QLatin1String("    -c <IP>: Set IP or name to connect to") << Qt::endl;
   //qout << QLatin1String("    -d <ms>: Set delay to wait between file transfers (in ms, default is 100)") << Qt::endl;
   qout << QLatin1String("    -tar: Use tar to archive contents of path") << Qt::endl;
+  qout << QLatin1String("    -zip: Use gzip to compress contents of path") << Qt::endl;
   qout << QLatin1String("    -g <pathToGorg>: Set a filename or path to gorg (send)") << Qt::endl;
   qout << QLatin1String("    -p <portnumber>: Set port to connect or listen to connections (default is 10000)") << Qt::endl;
   qout << QLatin1String("    -z [IP]: Enter Zorg mode (listen to connections). If IP is ommited, GorgZorg will guess it") << Qt::endl;
