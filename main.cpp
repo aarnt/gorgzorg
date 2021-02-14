@@ -109,21 +109,27 @@ int main(int argc, char *argv[])
       exit(1);
     }
 
-    //Checks if the user wants path to be "tared"
+    //Checks if user wants path to be "tared"
     if (argList->getSwitch(QLatin1String("-tar")))
     {
       gz.setTarContents();
+    }
+
+    //Checks if user wants path to be "ziped"
+    if (argList->getSwitch(QLatin1String("-zip")))
+    {
+      gz.setZipContents();
     }
 
     aux = argList->getSwitchArg(QLatin1String("-g"));
     if (!aux.isEmpty())
     {
       pathToGorg=aux;
-      if (pathToGorg.startsWith(QLatin1String("/")))
+      /*if (pathToGorg.startsWith(QLatin1String("/")))
       {
         qout << QLatin1String("ERROR: GorgZorg only works with relative files or relative paths!") << Qt::endl;
         exit(1);
-      }
+      }*/
     }
     else
     {

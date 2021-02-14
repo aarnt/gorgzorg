@@ -30,8 +30,8 @@ $make
     -h: Show this help
     -v: Verbose mode. When gorging, show speed. When zorging, show bytes received
     -c <IP>: Set IP or name to connect to
-    -tar: Use tar to archive contents of relative path
-    -g <relativepath>: Set a relative filename or relative path to gorg (send)
+    -tar: Use tar to archive contents of path
+    -g <pathToGorg>: Set a filename or path to gorg (send)
     -p <portnumber>: Set port to connect or listen to connections (default is 10000)
     -z [IP]: Enter Zorg mode (listen to connections). If IP is ommited, GorgZorg will guess it
 

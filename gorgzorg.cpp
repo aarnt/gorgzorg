@@ -153,12 +153,24 @@ void GorgZorg::sendFile(const QString &filePath)
 
 QString GorgZorg::createArchive(const QString &pathToArchive)
 {
+  QTextStream qout(stdout);
+
+  if (m_zipContents)
+    qout << Qt::endl << QLatin1String("Compressing %1").arg(pathToArchive);
+  else
+    qout << Qt::endl << QLatin1String("Archiving %1").arg(pathToArchive);
+
   quint32 gen = QRandomGenerator::global()->generate();
   QString archiveFileName = QLatin1String("gorged_%1.tar").arg(QString::number(gen));
 
   QProcess tar;
   QStringList params;
-  params << QLatin1String("-cf");
+
+  if (m_zipContents)
+    params << QLatin1String("-czf");
+  else
+    params << QLatin1String("-cf");
+
   params << archiveFileName;
   params << pathToArchive;
   tar.execute(QLatin1String("tar"), params);
@@ -185,27 +197,33 @@ void GorgZorg::connectAndSend(const QString &targetAddress, const QString &pathT
   }
 
   m_connectionTimer->start(3000);
-  if (m_verbose) m_timer->start();
 
   if (fi.isFile())
   {
-    if (m_tarContents)
+    if (m_tarContents || m_zipContents)
     {
       m_archiveFileName = createArchive(pathToGorg);
+      if (m_verbose) m_timer->start();
       sendFile(m_archiveFileName);
     }
     else
+    {
+      if (m_verbose) m_timer->start();
       sendFile(pathToGorg);
+    }
   }
   else
   {
-    if (m_tarContents)
+    if (m_tarContents || m_zipContents)
     {
       m_archiveFileName = createArchive(pathToGorg);
+      if (m_verbose) m_timer->start();
       sendFile(m_archiveFileName);
     }
     else
     {
+      if (m_verbose) m_timer->start();
+
       //Loop thru the dirs/files on pathToGorg
       QDirIterator it(pathToGorg, QDir::AllEntries | QDir::Hidden | QDir::System, QDirIterator::Subdirectories);
       while (it.hasNext())
@@ -221,10 +239,11 @@ void GorgZorg::connectAndSend(const QString &targetAddress, const QString &pathT
     }
   }
 
+  //Let's print some statistics if verbose is on
   if (m_verbose)
   {
     double duration = m_timer->elapsed() / 1000.0; //duration of send in seconds
-    double bytesSent = (m_totalSent / 1024.0) / 1024.0;
+    double bytesSent = (m_totalSent / 1024.0) / 1024.0; //sent bytes in MB
     double speed = bytesSent / duration;
     QString strDuration = QString::number(duration, 'f', 2);
     QString strBytesSent = QString::number(bytesSent, 'f', 2);
@@ -401,6 +420,9 @@ void GorgZorg::readClient()
 
     if (!m_currentPath.isEmpty())
     {
+      if (m_currentPath.startsWith("/"))  //test code
+        m_currentPath.remove(0,1);
+
       m_currentPath.remove("../");
       m_currentPath.remove("./");
       QProcess p;
@@ -524,8 +546,8 @@ void GorgZorg::showHelp()
   qout << QLatin1String("    -v: Verbose mode. When gorging, show speed. When zorging, show bytes received") << Qt::endl;
   qout << QLatin1String("    -c <IP>: Set IP or name to connect to") << Qt::endl;
   //qout << QLatin1String("    -d <ms>: Set delay to wait between file transfers (in ms, default is 100)") << Qt::endl;
-  qout << QLatin1String("    -tar: Use tar to archive contents of relative path") << Qt::endl;
-  qout << QLatin1String("    -g <relativepath>: Set a relative filename or relative path to gorg (send)") << Qt::endl;
+  qout << QLatin1String("    -tar: Use tar to archive contents of path") << Qt::endl;
+  qout << QLatin1String("    -g <pathToGorg>: Set a filename or path to gorg (send)") << Qt::endl;
   qout << QLatin1String("    -p <portnumber>: Set port to connect or listen to connections (default is 10000)") << Qt::endl;
   qout << QLatin1String("    -z [IP]: Enter Zorg mode (listen to connections). If IP is ommited, GorgZorg will guess it") << Qt::endl;
   qout << Qt::endl << QLatin1String("  Version: ") << ctn_VERSION << Qt::endl << Qt::endl;

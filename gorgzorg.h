@@ -59,6 +59,7 @@ private:
   //int m_delay;
   int m_port;
   bool m_tarContents;
+  bool m_zipContents;
   bool m_sendingADir;
   bool m_receivingADir;
   bool m_verbose;
@@ -92,6 +93,7 @@ public:
   //inline void setDelay(int delay) { m_delay = delay; }
   inline void setPort(int port) { m_port = port; }
   inline void setTarContents() { m_tarContents = true; }
+  inline void setZipContents() { m_zipContents = true; }
   inline void setVerbose() { m_verbose = true; }
 
 signals:
