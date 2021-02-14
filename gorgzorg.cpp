@@ -116,15 +116,22 @@ bool GorgZorg::isLocalIP(const QString &ip)
     return false;
 }
 
+void GorgZorg::removeArchive()
+{
+  if (QFile::exists(m_archiveFileName) && (m_archiveFileName.endsWith(".tar") || m_archiveFileName.endsWith(".tar.gz")))
+  {
+    QFile::remove(m_archiveFileName);
+  }
+}
+
 void GorgZorg::onTimeout()
 {
   //If after 5 seconds, there is no byte written, let's abort gorging...
   if (m_totalSize == 0)
   {
-    if (m_tarContents) //If there is an archived file that was not sent, let's remove it
+    if (m_tarContents || m_zipContents) //If there is an archived file that was not sent, let's remove it
     {
-      if (QFile::exists(m_archiveFileName) && m_archiveFileName.endsWith(".tar"))
-        QFile::remove(m_archiveFileName);
+      removeArchive();
     }
 
     QTextStream qout(stdout);
@@ -163,6 +170,11 @@ QString GorgZorg::createArchive(const QString &pathToArchive)
   quint32 gen = QRandomGenerator::global()->generate();
   QString archiveFileName = QLatin1String("gorged_%1.tar").arg(QString::number(gen));
 
+  if (m_zipContents)
+  {
+    archiveFileName += QLatin1String(".gz");
+  }
+
   QProcess tar;
   QStringList params;
 
@@ -174,6 +186,8 @@ QString GorgZorg::createArchive(const QString &pathToArchive)
   params << archiveFileName;
   params << pathToArchive;
   tar.execute(QLatin1String("tar"), params);
+  tar.waitForFinished(-1);
+  tar.close();
 
   return archiveFileName;
 }
@@ -254,6 +268,7 @@ void GorgZorg::connectAndSend(const QString &targetAddress, const QString &pathT
     qout << QLatin1String("Speed: %1 MB/s").arg(strSpeed) << Qt::endl;
   }
 
+  removeArchive();
   qout << Qt::endl;
   exit(0);
 }
@@ -376,8 +391,6 @@ void GorgZorg::goOnSend(qint64 numBytes) // Start sending file content
     {
       m_localFile->close();
     }
-
-    //emit endTransfer();
   }
 }
 

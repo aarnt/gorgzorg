@@ -87,6 +87,8 @@ public:
   void connectAndSend(const QString &targetAddress, const QString &pathToGorg);
   void startServer(const QString &ipAddress = "");
   void showHelp();
+
+  void removeArchive();
   static bool isValidIP(const QString &ip);
   static bool isLocalIP(const QString &ip);
 
