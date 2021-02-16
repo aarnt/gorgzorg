@@ -91,8 +91,7 @@ char question(const QString &strQuestion)
 }
 
 /*
- * Methods from class GorgZorg
- *
+ * GorgZorg class methods
  */
 
 QString GorgZorg::getWorkingDirectory()
@@ -191,34 +190,9 @@ bool GorgZorg::isLocalIP(const QString &ip)
     return false;
 }
 
-void GorgZorg::removeArchive()
-{
-  if (QFile::exists(m_archiveFileName) && (m_archiveFileName.endsWith(".tar") || m_archiveFileName.endsWith(".tar.gz")))
-  {
-    QFile::remove(m_archiveFileName);
-  }
-}
-
-void GorgZorg::sendFile(const QString &filePath)
-{
-  if (prepareToSendFile(filePath))
-  {
-    if (m_sendTimes == 0) // Only the first time it is sent, it happens when the connection generates the signal connect
-    {
-      m_tcpClient->connectToHost(QHostAddress(m_targetAddress), m_port);
-      m_sendTimes = 1;
-    }
-    else
-    {
-      send(); // When sending for the first time, connectToHost initiates the connect signal to call send, and you need to call send after the second time
-    }
-  }
-
-  QEventLoop eventLoop;
-  QObject::connect(this, &GorgZorg::endTransfer, &eventLoop, &QEventLoop::quit);
-  eventLoop.exec();
-}
-
+/*
+ * Creates a ".tar" or ".tar.gz" archive to send based on "-tar"/"-zip" command line params
+ */
 QString GorgZorg::createArchive(const QString &pathToArchive)
 {
   QTextStream qout(stdout);
@@ -254,10 +228,76 @@ QString GorgZorg::createArchive(const QString &pathToArchive)
 }
 
 /*
+ * Removes any not sent archive
+ */
+void GorgZorg::removeArchive()
+{
+  if (QFile::exists(m_archiveFileName) && (m_archiveFileName.endsWith(".tar") || m_archiveFileName.endsWith(".tar.gz")))
+  {
+    QFile::remove(m_archiveFileName);
+  }
+}
+
+/*
+ * Opens the given file. If it cannot open, returns false
+ */
+bool GorgZorg::prepareToSendFile(const QString &fName)
+{
+  m_fileName = fName;
+  m_loadSize = 0;
+  m_byteToWrite = 0;
+  m_totalSize = 0;
+  m_outBlock.clear();
+  m_sendingADir = false;
+  QTextStream qout(stdout);
+
+  if (fName.startsWith(ctn_DIR_ESCAPE))
+  {
+    m_sendingADir = true;
+  }
+  else
+  {
+    m_localFile = new QFile(m_fileName);
+    if (!m_localFile->open(QFile::ReadOnly))
+    {
+      qout << QLatin1String("ERROR: %1 could not be opened").arg(m_fileName) << Qt::endl;
+      return false;
+    }
+  }
+
+  return true;
+}
+
+/*
+ * Transfers a single file when traversing a directory passed by command line
+ */
+void GorgZorg::sendFile(const QString &filePath)
+{
+  if (prepareToSendFile(filePath))
+  {
+    if (m_sendTimes == 0) // Only the first time it is sent, it happens when the connection generates the signal connect
+    {
+      m_tcpClient->connectToHost(QHostAddress(m_targetAddress), m_port);
+      m_sendTimes = 1;
+    }
+    else
+    {
+      send(); // When sending for the first time, connectToHost initiates the connect signal to call send, and you need to call send after the second time
+    }
+  }
+
+  QEventLoop eventLoop;
+  QObject::connect(this, &GorgZorg::endTransfer, &eventLoop, &QEventLoop::quit);
+  eventLoop.exec();
+}
+
+/*
  * Threaded methods to connect and send data to client
  *
  * It can send just one file or entire paths (with subpaths)
  * When sending paths, it can archive them with tar/gzip before sending
+ *
+ * connectAndSend is the main method called directly by the "-g" command line param
  */
 void GorgZorg::connectAndSend(const QString &targetAddress, const QString &pathToGorg)
 {
@@ -336,36 +376,6 @@ void GorgZorg::connectAndSend(const QString &targetAddress, const QString &pathT
   exit(0);
 }
 
-/*
- * Opens the given file. If it cannot open, returns false
- */
-bool GorgZorg::prepareToSendFile(const QString &fName)
-{
-  m_fileName = fName;
-  m_loadSize = 0;
-  m_byteToWrite = 0;
-  m_totalSize = 0;
-  m_outBlock.clear();
-  m_sendingADir = false;
-  QTextStream qout(stdout);
-
-  if (fName.startsWith(ctn_DIR_ESCAPE))
-  {
-    m_sendingADir = true;
-  }
-  else
-  {
-    m_localFile = new QFile(m_fileName);
-    if (!m_localFile->open(QFile::ReadOnly))
-    {
-      qout << QLatin1String("ERROR: %1 could not be opened").arg(m_fileName) << Qt::endl;
-      return false;
-    }
-  }
-
-  return true;
-}
-
 // Send file header information, so the server can opt to accept or deny transfer
 void GorgZorg::sendFileHeader(const QString &filePath)
 {
@@ -439,7 +449,9 @@ void GorgZorg::sendFileHeader(const QString &filePath)
   }
 }
 
-// Send directory header information, so the server can opt to accept or deny transfer
+/*
+ * Sends directory header information, so the server can opt to accept or deny transfer
+ */
 void GorgZorg::sendDirHeader(const QString &filePath)
 {
   m_fileName = filePath;
@@ -495,7 +507,9 @@ void GorgZorg::sendDirHeader(const QString &filePath)
   QObject::connect(m_tcpClient, &QTcpSocket::bytesWritten, this, &GorgZorg::goOnSend);
 }
 
-// Send file header information
+/*
+ * Sends file header information, so the server can opt to accept or deny transfer
+ */
 void GorgZorg::sendFileBody()
 {
   QTextStream qout(stdout);
@@ -533,6 +547,9 @@ void GorgZorg::sendFileBody()
   m_tcpClient->write(m_outBlock); // Send the read file to the socket
 }
 
+/*
+ * Sends header information of the file that belongs to the path we are traversing
+ */
 void GorgZorg::send()
 {
   QTextStream qout(stdout);
@@ -575,6 +592,9 @@ void GorgZorg::send()
   m_tcpClient->write(m_outBlock); // Send the read file to the socket
 }
 
+/*
+ * Sends contents of file that belongs to the path we are traversing
+ */
 void GorgZorg::goOnSend(qint64 numBytes) // Start sending file content
 {
   QTextStream qout(stdout);
@@ -621,6 +641,9 @@ void GorgZorg::goOnSend(qint64 numBytes) // Start sending file content
  *  SERVER SIDE PART *****************************************************************
  */
 
+/*
+ * Starts listening for file transfers on port m_port of the given ipAddress
+ */
 void GorgZorg::startServer(const QString &ipAddress)
 {
   m_totalSize = 0;
@@ -669,6 +692,9 @@ void GorgZorg::acceptConnection()
   QObject::connect(m_receivedSocket, &QTcpSocket::readyRead, this, &GorgZorg::readClient);
 }
 
+/*
+ * Whenever clients send bytes, readClient is called!
+ */
 void GorgZorg::readClient()
 {
   QTextStream qout(stdout);
@@ -902,6 +928,8 @@ void GorgZorg::showHelp()
   qout << Qt::endl << QLatin1String("  Version: ") << ctn_VERSION << Qt::endl << Qt::endl;
 
   qout << Qt::endl << QLatin1String("  Examples:") << Qt::endl;
+  qout << Qt::endl << QLatin1String("    #Send file /home/user/Projects/gorgzorg/LICENSE to IP 10.0.1.60 on port 45400") << Qt::endl;
+  qout << QLatin1String("    gorgzorg -c 10.0.1.60 -g /home/user/Projects/gorgzorg/LICENSE -p 45400") << Qt::endl;
   qout << Qt::endl << QLatin1String("    #Send contents of Test directory to IP 192.168.1.1 on (default) port 10000") << Qt::endl;
   qout << QLatin1String("    gorgzorg -c 192.168.1.1 -g Test") << Qt::endl;
   qout << Qt::endl << QLatin1String("    #Send archived contents of Crucial directory to IP 172.16.20.21") << Qt::endl;

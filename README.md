@@ -41,6 +41,9 @@ $make
 ### Examples
 
 ```
+#Send file /home/user/Projects/gorgzorg/LICENSE to IP 10.0.1.60 on port 45400
+gorgzorg -c 10.0.1.60 -g /home/user/Projects/gorgzorg/LICENSE -p 45400
+
 #Send contents of Test directory to IP 192.168.1.1 on (default) port 10000
 gorgzorg -c 192.168.1.1 -g Test  
 
