@@ -30,11 +30,11 @@ class QTcpServer;
 class QFile;
 class QElapsedTimer;
 
-const QString ctn_VERSION = "0.2 (dev)";
-const QString ctn_DIR_ESCAPE = "<^dir$>:";
-const QString ctn_ZORGED_OK = "Z_OK";
-const QString ctn_ZORGED_OK_SEND = "Z_OK_SEND";
-const QString ctn_ZORGED_CANCEL_SEND = "Z_KO_SEND";
+const QString ctn_VERSION = QLatin1String("0.2 (dev)");
+const QString ctn_DIR_ESCAPE = QLatin1String("<^dir$>:");
+const QString ctn_ZORGED_OK = QLatin1String("Z_OK");
+const QString ctn_ZORGED_OK_SEND = QLatin1String("Z_OK_SEND");
+const QString ctn_ZORGED_CANCEL_SEND = QLatin1String("Z_KO_SEND");
 
 class GorgZorg: public QObject
 {
@@ -46,7 +46,7 @@ private:
   QTcpSocket *m_tcpClient;
   QTcpServer *m_server;
   QTcpSocket *m_receivedSocket;
-  QElapsedTimer *m_timer;    //Counts ms since starting sending files
+  QElapsedTimer *m_elapsedTime; //Counts ms since starting sending files
 
   QByteArray m_outBlock;
   QByteArray m_inBlock;

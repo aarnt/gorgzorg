@@ -96,12 +96,16 @@ char question(const QString &strQuestion)
 
 QString GorgZorg::getWorkingDirectory()
 {
+  QString res;
   QProcess pwd;
   QStringList params;
   pwd.start(QLatin1String("pwd"), params);
   pwd.waitForFinished(-1);
 
-  return pwd.readAllStandardOutput();
+  res = pwd.readAllStandardOutput();
+  res.remove("\n");
+
+  return res;
 }
 
 GorgZorg::GorgZorg()
@@ -112,7 +116,7 @@ GorgZorg::GorgZorg()
   m_totalSent = 0;
   m_targetAddress = "";
   m_port = 10000;
-  m_timer = new QElapsedTimer();
+  m_elapsedTime = new QElapsedTimer();
   m_alwaysAccept = false;
   m_askForAccept = true;
   m_singleTransfer = false;
@@ -196,6 +200,17 @@ bool GorgZorg::isLocalIP(const QString &ip)
 QString GorgZorg::createArchive(const QString &pathToArchive)
 {
   QTextStream qout(stdout);
+  bool asterisk = false;
+  QString realPath;
+  QString filter;
+
+  if (pathToArchive.contains(QRegularExpression("\\*\\.*")))
+  {
+    asterisk = true;
+    int cutName=pathToArchive.size()-pathToArchive.lastIndexOf('/')-1;
+    filter = pathToArchive.right(cutName);
+    realPath = pathToArchive.left(pathToArchive.size()-cutName);
+  }
 
   if (m_zipContents)
     qout << Qt::endl << QLatin1String("Compressing %1").arg(pathToArchive);
@@ -210,19 +225,34 @@ QString GorgZorg::createArchive(const QString &pathToArchive)
     archiveFileName += QLatin1String(".gz");
   }
 
-  QProcess tar;
-  QStringList params;
+  QProcess p;
+  QStringList tarParams, findParams;
 
   if (m_zipContents)
-    params << QLatin1String("-czf");
+    tarParams << QLatin1String("-czf");
   else
-    params << QLatin1String("-cf");
+    tarParams << QLatin1String("-cf");
 
-  params << archiveFileName;
-  params << pathToArchive;
-  tar.execute(QLatin1String("tar"), params);
-  tar.waitForFinished(-1);
-  tar.close();
+  if (asterisk)
+  {
+    QString findCommand = QLatin1String("find ") + realPath +
+        QLatin1String(" -name ") + QLatin1String("\"") + filter + QLatin1String("\"") +
+        QLatin1String(" -exec tar ") + tarParams.at(0) + QLatin1String(" ") + archiveFileName + QLatin1String(" {} +");
+
+    findParams << QLatin1String("-c");
+    findParams << findCommand;
+    p.execute(QLatin1String("/bin/sh"), findParams);
+    p.waitForFinished(-1);
+    p.close();
+  }
+  else
+  {
+    tarParams << archiveFileName;
+    tarParams << pathToArchive;
+    p.execute(QLatin1String("tar"), tarParams);
+    p.waitForFinished(-1);
+    p.close();
+  }
 
   return archiveFileName;
 }
@@ -304,25 +334,53 @@ void GorgZorg::connectAndSend(const QString &targetAddress, const QString &pathT
   QTextStream qout(stdout);
   m_targetAddress = targetAddress;
   QFileInfo fi(pathToGorg);
+  bool asterisk = false;
+  QString realPath;
+  QString filter;
 
-  if (!fi.exists())
+  if (pathToGorg.contains(QRegularExpression("\\*\\.*")))
+  {
+    asterisk = true;
+
+    int cutName=pathToGorg.size()-pathToGorg.lastIndexOf('/')-1;
+    filter = pathToGorg.right(cutName);
+    realPath = pathToGorg.left(pathToGorg.size()-cutName);
+
+    if (realPath.isEmpty())
+      realPath = getWorkingDirectory();
+
+    /*QStringList nameFilters;
+    nameFilters << filter;
+    QDirIterator *it = new QDirIterator(realPath, nameFilters, QDir::AllEntries | QDir::Hidden | QDir::System, QDirIterator::Subdirectories);
+
+    while (it->hasNext())
+    {
+      qout << Qt::endl << "ITEM: " << it->next();
+    }
+
+    qout << QLatin1String("realPath: %1").arg(realPath) << Qt::endl;
+    qout << QLatin1String("asteriskPart: %1").arg(filter) << Qt::endl;
+    exit(1);*/
+  }
+
+  if (!asterisk && !fi.exists())
   {
     qout << QLatin1String("ERROR: %1 could not be found!").arg(pathToGorg) << Qt::endl;
     exit(1);
   }
 
-  if (fi.isFile())
+  if (!asterisk && fi.isFile())
   {
     if (m_tarContents || m_zipContents)
     {
       m_archiveFileName = createArchive(pathToGorg);            
-      if (m_verbose) m_timer->start();
+      if (m_verbose) m_elapsedTime->start();
 
       sendFileHeader(m_archiveFileName);
     }
     else
     {
-      if (m_verbose) m_timer->start();
+      if (m_verbose) m_elapsedTime->start();
       sendFileHeader(pathToGorg);
     }
   }
@@ -330,24 +388,39 @@ void GorgZorg::connectAndSend(const QString &targetAddress, const QString &pathT
   {
     if (m_tarContents || m_zipContents)
     {
-      m_archiveFileName = createArchive(pathToGorg);
-      if (m_verbose) m_timer->start();
-      sendFileHeader(m_archiveFileName);
+      {
+        m_archiveFileName = createArchive(pathToGorg);
+        if (m_verbose) m_elapsedTime->start();
+        sendFileHeader(m_archiveFileName);
+      }
     }
     else
     {
-      if (m_verbose) m_timer->start();
+      if (m_verbose) m_elapsedTime->start();
 
-      sendDirHeader(pathToGorg);
+      if (asterisk)
+        sendDirHeader(realPath);
+      else
+        sendDirHeader(pathToGorg);
+
+      QDirIterator *it;
 
       //Loop thru the dirs/files on pathToGorg
-      QDirIterator it(pathToGorg, QDir::AllEntries | QDir::Hidden | QDir::System, QDirIterator::Subdirectories);
-      while (it.hasNext())
+      if (asterisk) //If user passed some name filter path (ex: *.mp3)
       {
-        QString traverse = it.next();
+        QStringList nameFilters;
+        nameFilters << filter;
+        it = new QDirIterator(realPath, nameFilters, QDir::AllEntries | QDir::Hidden | QDir::System, QDirIterator::Subdirectories);
+      }
+      else
+        it = new QDirIterator(pathToGorg, QDir::AllEntries | QDir::Hidden | QDir::System, QDirIterator::Subdirectories);
+
+      while (it->hasNext())
+      {
+        QString traverse = it->next();
         if (traverse.endsWith(QLatin1String(".")) || traverse.endsWith(QLatin1String(".."))) continue;
 
-        if (it.fileInfo().isDir())
+        if (it->fileInfo().isDir())
           traverse = ctn_DIR_ESCAPE + traverse;
 
         sendFile(traverse);
@@ -358,7 +431,7 @@ void GorgZorg::connectAndSend(const QString &targetAddress, const QString &pathT
   //Let's print some statistics if verbose is on
   if (m_verbose)
   {
-    double duration = m_timer->elapsed() / 1000.0; //duration of send in seconds
+    double duration = m_elapsedTime->elapsed() / 1000.0; //duration of send in seconds
     double bytesSent = (m_totalSent / 1024.0) / 1024.0; //sent bytes in MB
     double speed = bytesSent / duration;
 
@@ -750,7 +823,6 @@ void GorgZorg::readClient()
 
     if (m_askForAccept && !m_alwaysAccept)
     {
-      bool returnFromHere = false;
       while(true)
       {
         //std::cout << std::endl << "Do you want to zorg " << m_currentFileName.toLatin1().data() << " with " << strTotalSize.toLatin1().data() << " (y/n)? ";
@@ -776,12 +848,10 @@ void GorgZorg::readClient()
           m_receivedSocket->write(ctn_ZORGED_CANCEL_SEND.toLatin1());
           m_byteReceived = 0;
           m_totalSize = 0;
-          returnFromHere = true;
+
           return;
         }
       }
-
-      if (returnFromHere) return;
     }
     else if (!m_askForAccept || m_alwaysAccept)
     {
