@@ -114,18 +114,14 @@ GorgZorg::GorgZorg()
   m_targetAddress = "";
   m_port = 10000;
   m_timer = new QElapsedTimer();
+  m_alwaysAccept = false;
   m_askForAccept = true;
   m_singleTransfer = false;
   m_tarContents = false;
   m_zipContents = false;
   m_verbose = false;
 
-  m_alwaysAccept = false;
-
-  //QObject::connect(m_connectionTimer, &QTimer::timeout, this, &GorgZorg::onTimeout);
-  //QObject::connect(m_tcpClient, &QTcpSocket::connected, this, &GorgZorg::send); // When the connection is successful, start to transfer files
   QObject::connect(m_tcpClient, &QTcpSocket::readyRead, this, &GorgZorg::readResponse);
-  //QObject::connect(m_tcpClient, &QTcpSocket::bytesWritten, this, &GorgZorg::goOnSend);
 }
 
 /*
@@ -261,7 +257,7 @@ QString GorgZorg::createArchive(const QString &pathToArchive)
  * Threaded methods to connect and send data to client
  *
  * It can send just one file or entire paths (with subpaths)
- * When sending paths, it can archive them with tar before sending
+ * When sending paths, it can archive them with tar/gzip before sending
  */
 void GorgZorg::connectAndSend(const QString &targetAddress, const QString &pathToGorg)
 {
@@ -303,7 +299,6 @@ void GorgZorg::connectAndSend(const QString &targetAddress, const QString &pathT
       if (m_verbose) m_timer->start();
 
       sendDirHeader(pathToGorg);
-      QObject::connect(m_tcpClient, &QTcpSocket::bytesWritten, this, &GorgZorg::goOnSend);
 
       //Loop thru the dirs/files on pathToGorg
       QDirIterator it(pathToGorg, QDir::AllEntries | QDir::Hidden | QDir::System, QDirIterator::Subdirectories);
@@ -497,6 +492,7 @@ void GorgZorg::sendDirHeader(const QString &filePath)
 
   QObject::connect(this, &GorgZorg::endTransfer, &eventLoop, &QEventLoop::quit);
   eventLoop.exec();
+  QObject::connect(m_tcpClient, &QTcpSocket::bytesWritten, this, &GorgZorg::goOnSend);
 }
 
 // Send file header information
