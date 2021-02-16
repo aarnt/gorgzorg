@@ -1,5 +1,6 @@
 0.2 (dev)
   Always query user to accept any incoming file/path.
+  Added support for gorging with '*.string' or 'string.*' filter expressions.
   Added "-y" param to automatically accept any client transfer.
   Added "-q" param to quit zorging after a transfer.
 

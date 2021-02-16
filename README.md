@@ -51,6 +51,13 @@ gorgzorg -c 192.168.1.1 -g Test
 #Send archived contents of Crucial directory to IP 172.16.20.21
 gorgzorg -c 172.16.20.21 -g Crucial -tar
 
+#Send contents of filter expression to IP 192.168.0.100
+gorgzorg -c 192.168.0.100 -g '/home/user/Pictures/*.png'
+
 #Start a GorgZorg server on address 192.168.10.16:20000
 gorgzorg -p 20000 -z 192.168.10.16
+
+#Start a GorgZorg server on address 172.16.11.43 on (default) port 10000
+#Always accept transfers and quit just after receiving one
+gorgzorg -z 172.16.11.43 -y -q
 ```

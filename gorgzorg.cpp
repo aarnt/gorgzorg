@@ -1018,7 +1018,6 @@ void GorgZorg::readClient()
 void GorgZorg::showHelp()
 {
   QTextStream qout(stdout);
-
   qout << Qt::endl << QLatin1String("  GorgZorg, a simple CLI network file transfer tool") << Qt::endl;
   qout << Qt::endl << QLatin1String("    -c <IP>: Set IP or name to connect to") << Qt::endl;
   qout << QLatin1String("    -g <pathToGorg>: Set a filename or path to gorg (send)") << Qt::endl;
@@ -1040,6 +1039,11 @@ void GorgZorg::showHelp()
   qout << QLatin1String("    gorgzorg -c 192.168.1.1 -g Test") << Qt::endl;
   qout << Qt::endl << QLatin1String("    #Send archived contents of Crucial directory to IP 172.16.20.21") << Qt::endl;
   qout << QLatin1String("    gorgzorg -c 172.16.20.21 -g Crucial -tar") << Qt::endl;
+  qout << Qt::endl << QLatin1String("    #Send contents of filter expression to IP 192.168.0.100") << Qt::endl;
+  qout << QLatin1String("    gorgzorg -c 192.168.0.100 -g '/home/user/Pictures/*.png'") << Qt::endl;
   qout << Qt::endl << QLatin1String("    #Start a GorgZorg server on address 192.168.10.16:20000") << Qt::endl;
-  qout << QLatin1String("    gorgzorg -p 20000 -z 192.168.10.16") << Qt::endl << Qt::endl;
+  qout << QLatin1String("    gorgzorg -p 20000 -z 192.168.10.16") << Qt::endl;
+  qout << Qt::endl << QLatin1String("    #Start a GorgZorg server on address 172.16.11.43 on (default) port 10000") << Qt::endl;
+  qout << QLatin1String("    #Always accept transfers and quit just after receiving one") << Qt::endl;
+  qout << QLatin1String("    gorgzorg -z 172.16.11.43 -y -q") << Qt::endl << Qt::endl;
 }
