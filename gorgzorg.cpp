@@ -906,7 +906,7 @@ void GorgZorg::showHelp()
   qout << Qt::endl << QLatin1String("  Version: ") << ctn_VERSION << Qt::endl << Qt::endl;
 
   qout << Qt::endl << QLatin1String("  Examples:") << Qt::endl;
-  qout << Qt::endl << QLatin1String("    #Send contents of Test directory to IP 192.168.1.1") << Qt::endl;
+  qout << Qt::endl << QLatin1String("    #Send contents of Test directory to IP 192.168.1.1 on (default) port 10000") << Qt::endl;
   qout << QLatin1String("    gorgzorg -c 192.168.1.1 -g Test") << Qt::endl;
   qout << Qt::endl << QLatin1String("    #Send archived contents of Crucial directory to IP 172.16.20.21") << Qt::endl;
   qout << QLatin1String("    gorgzorg -c 172.16.20.21 -g Crucial -tar") << Qt::endl;

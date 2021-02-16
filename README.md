@@ -41,7 +41,7 @@ $make
 ### Examples
 
 ```
-#Send contents of Test directory to IP 192.168.1.1
+#Send contents of Test directory to IP 192.168.1.1 on (default) port 10000
 gorgzorg -c 192.168.1.1 -g Test  
 
 #Send archived contents of Crucial directory to IP 172.16.20.21
