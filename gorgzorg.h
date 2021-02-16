@@ -35,6 +35,7 @@ const QString ctn_DIR_ESCAPE = QLatin1String("<^dir$>:");
 const QString ctn_ZORGED_OK = QLatin1String("Z_OK");
 const QString ctn_ZORGED_OK_SEND = QLatin1String("Z_OK_SEND");
 const QString ctn_ZORGED_CANCEL_SEND = QLatin1String("Z_KO_SEND");
+const QString ctn_END_OF_TRANSFER = QLatin1String("<[--Finis_tr@nslationi$--]>");
 
 class GorgZorg: public QObject
 {
@@ -47,10 +48,8 @@ private:
   QTcpServer *m_server;
   QTcpSocket *m_receivedSocket;
   QElapsedTimer *m_elapsedTime; //Counts ms since starting sending files
-
   QByteArray m_outBlock;
   QByteArray m_inBlock;
-
   QFile *m_localFile;
   QFile *m_newFile;
 
@@ -60,6 +59,8 @@ private:
   QString m_targetAddress;
   QString m_archiveFileName; //Contains the random generated name of the archived path to send
 
+  bool m_createMasterDir;
+  bool m_singleTransfer;
   bool m_tarContents;
   bool m_zipContents;
   bool m_sendingADir;
@@ -67,8 +68,7 @@ private:
   bool m_verbose;
   bool m_alwaysAccept;
   bool m_askForAccept;
-  bool m_createMasterDir;
-  bool m_singleTransfer;
+  bool m_quitServer;
 
   qint64 m_loadSize;        //The size of each send data
   qint64 m_byteToWrite;     //The remaining data size
@@ -84,6 +84,7 @@ private:
   void sendFile(const QString &filePath);
   void sendFileHeader(const QString &filePath);
   void sendDirHeader(const QString &filePath);
+  void sendEndOfTransfer();
 
 private slots:
   void acceptConnection();
@@ -109,6 +110,7 @@ public:
   inline void setZipContents() { m_zipContents = true; }
   inline void setVerbose() { m_verbose = true; }
   inline void setAlwaysAccept() { m_alwaysAccept = true; }
+  inline void setQuitServer() { m_quitServer = true; }
 
 signals:
   void endTransfer();

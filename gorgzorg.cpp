@@ -123,6 +123,7 @@ GorgZorg::GorgZorg()
   m_tarContents = false;
   m_zipContents = false;
   m_verbose = false;
+  m_quitServer = false;
 
   QObject::connect(m_tcpClient, &QTcpSocket::readyRead, this, &GorgZorg::readResponse);
 }
@@ -315,6 +316,7 @@ void GorgZorg::sendFile(const QString &filePath)
       send(); // When sending for the first time, connectToHost initiates the connect signal to call send, and you need to call send after the second time
     }
   }
+  else return;
 
   QEventLoop eventLoop;
   QObject::connect(this, &GorgZorg::endTransfer, &eventLoop, &QEventLoop::quit);
@@ -348,19 +350,6 @@ void GorgZorg::connectAndSend(const QString &targetAddress, const QString &pathT
 
     if (realPath.isEmpty())
       realPath = getWorkingDirectory();
-
-    /*QStringList nameFilters;
-    nameFilters << filter;
-    QDirIterator *it = new QDirIterator(realPath, nameFilters, QDir::AllEntries | QDir::Hidden | QDir::System, QDirIterator::Subdirectories);
-
-    while (it->hasNext())
-    {
-      qout << Qt::endl << "ITEM: " << it->next();
-    }
-
-    qout << QLatin1String("realPath: %1").arg(realPath) << Qt::endl;
-    qout << QLatin1String("asteriskPart: %1").arg(filter) << Qt::endl;
-    exit(1);*/
   }
 
   if (!asterisk && !fi.exists())
@@ -428,6 +417,8 @@ void GorgZorg::connectAndSend(const QString &targetAddress, const QString &pathT
     }
   }
 
+  sendEndOfTransfer();
+
   //Let's print some statistics if verbose is on
   if (m_verbose)
   {
@@ -447,6 +438,36 @@ void GorgZorg::connectAndSend(const QString &targetAddress, const QString &pathT
   removeArchive();
   qout << Qt::endl;
   exit(0);
+}
+
+/*
+ * Sends END OF TRANSFER signal to the server (goodbye, cruel world!)
+ */
+void GorgZorg::sendEndOfTransfer()
+{
+  QTextStream qout(stdout);
+  QObject::disconnect(m_tcpClient, &QTcpSocket::bytesWritten, this, &GorgZorg::goOnSend);
+
+  m_loadSize = 4 * 1024; // The size of data sent each time
+  m_byteToWrite = 0;
+  m_totalSize = 0;
+  m_totalSent += m_totalSize;
+
+  QDataStream out(&m_outBlock, QIODevice::WriteOnly);
+  m_currentFileName = ctn_END_OF_TRANSFER;
+  qout << Qt::endl << QLatin1String("Gorging goodbye...") << Qt::endl;
+
+  out << qint64(0) << qint64(0) << m_currentFileName << true;
+
+  m_totalSize += m_outBlock.size(); // The total size is the file size plus the size of the file name and other information
+  m_byteToWrite += m_outBlock.size();
+  m_totalSent += m_outBlock.size();
+
+  out.device()->seek(0); // Go back to the beginning of the byte stream to write a qint64 in front, which is the total size and file name and other information size
+  out << m_totalSize << qint64(m_outBlock.size());
+
+  m_tcpClient->write(m_outBlock); // Send the read file to the socket
+  m_tcpClient->waitForBytesWritten(-1);
 }
 
 // Send file header information, so the server can opt to accept or deny transfer
@@ -782,6 +803,20 @@ void GorgZorg::readClient()
 
     in >> m_totalSize >> m_byteReceived >> m_fileName >> m_singleTransfer;
 
+    if (m_fileName == ctn_END_OF_TRANSFER)
+    {
+      m_byteReceived = 0;
+      m_totalSize = 0;
+
+      //Client is saying goodbye...
+      qout << Qt::endl << QLatin1String("See you next time!") << Qt::endl << Qt::endl;
+
+      if (m_quitServer)
+        exit(0);
+      else
+        return;
+    }
+
     double totalSize;
     QString strTotalSize;
 
@@ -989,6 +1024,7 @@ void GorgZorg::showHelp()
   qout << QLatin1String("    -g <pathToGorg>: Set a filename or path to gorg (send)") << Qt::endl;
   qout << QLatin1String("    -h: Show this help") << Qt::endl;
   qout << QLatin1String("    -p <portnumber>: Set port to connect or listen to connections (default is 10000)") << Qt::endl;
+  qout << QLatin1String("    -q: Quit zorging after a transfer") << Qt::endl;
   qout << QLatin1String("    -tar: Use tar to archive contents of path") << Qt::endl;
   qout << QLatin1String("    -v: Verbose mode. When gorging, show speed. When zorging, show bytes received") << Qt::endl;
   qout << QLatin1String("    -y: When zorging, automatically accept any incoming file/path") << Qt::endl;

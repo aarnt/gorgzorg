@@ -79,6 +79,8 @@ int main(int argc, char *argv[])
       }
     }
 
+    if (argList->getSwitch("-q")) gz.setQuitServer();
+
     gz.startServer(aux);
   }
   else

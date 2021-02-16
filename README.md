@@ -31,6 +31,7 @@ $make
     -g <pathToGorg>: Set a filename or path to gorg (send)
     -h: Show this help
     -p <portnumber>: Set port to connect or listen to connections (default is 10000)
+    -q: Quit zorging after a transfer
     -tar: Use tar to archive contents of path
     -v: Verbose mode. When gorging, show speed. When zorging, show bytes received
     -y: When zorging, automatically accept any incoming file/path
