@@ -60,6 +60,8 @@ int main(int argc, char *argv[])
 
   if (argList->getSwitch("-y")) gz.setAlwaysAccept();
 
+  if (argList->getSwitch("-q")) gz.setQuitServer();
+
   if (argList->contains(QLatin1String("-z")))
   {
     aux = argList->getSwitchArg(QLatin1String("-z"));
@@ -78,8 +80,6 @@ int main(int argc, char *argv[])
         exit(1);
       }
     }
-
-    if (argList->getSwitch("-q")) gz.setQuitServer();
 
     gz.startServer(aux);
   }
