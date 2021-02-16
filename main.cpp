@@ -127,6 +127,12 @@ int main(int argc, char *argv[])
     aux = argList->getSwitchArg(QLatin1String("-g"));
     if (!aux.isEmpty())
     {
+      if (aux == "." || aux == ".." || aux == "./" || aux == "../")
+      {
+        qout << QLatin1String("ERROR: This path is not compatible!") << Qt::endl;
+        exit(1);
+      }
+
       pathToGorg=aux;
     }
     else
