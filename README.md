@@ -27,14 +27,15 @@ $make
 
 ### How to use GorgZorg
 
-    -h: Show this help
-    -v: Verbose mode. When gorging, show speed. When zorging, show bytes received
     -c <IP>: Set IP or name to connect to
-    -tar: Use tar to archive contents of path
-    -zip: Use gzip to compress contents of path
     -g <pathToGorg>: Set a filename or path to gorg (send)
+    -h: Show this help
     -p <portnumber>: Set port to connect or listen to connections (default is 10000)
+    -tar: Use tar to archive contents of path
+    -v: Verbose mode. When gorging, show speed. When zorging, show bytes received
+    -y: When zorging, automatically accept any incoming file/path
     -z [IP]: Enter Zorg mode (listen to connections). If IP is ommited, GorgZorg will guess it
+    -zip: Use gzip to compress contents of path
 
 
 ### Examples

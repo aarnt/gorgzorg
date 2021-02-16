@@ -1,0 +1,6 @@
+0.2 (dev)
+  Always query user to accept any incoming file/path.
+  Added "-y" param to automatically accept any client transfer.
+
+0.1.0 (2021-02-13)
+  Initial Proof of Concept release.

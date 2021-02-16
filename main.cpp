@@ -27,6 +27,7 @@
 int main(int argc, char *argv[])
 {
   QCoreApplication a(argc, argv);
+
   ArgumentList *argList = new ArgumentList(argc, argv);
   GorgZorg gz;
   QString target;
@@ -56,6 +57,8 @@ int main(int argc, char *argv[])
   }
 
   if (argList->getSwitch("-v")) gz.setVerbose();
+
+  if (argList->getSwitch("-y")) gz.setAlwaysAccept();
 
   if (argList->contains(QLatin1String("-z")))
   {
@@ -125,11 +128,6 @@ int main(int argc, char *argv[])
     if (!aux.isEmpty())
     {
       pathToGorg=aux;
-      /*if (pathToGorg.startsWith(QLatin1String("/")))
-      {
-        qout << QLatin1String("ERROR: GorgZorg only works with relative files or relative paths!") << Qt::endl;
-        exit(1);
-      }*/
     }
     else
     {
