@@ -584,6 +584,8 @@ void GorgZorg::sendDirHeader(const QString &filePath)
   QString aux = QLatin1String("Gorging header of dir %1").arg(m_currentFileName);
   qout << Qt::endl << aux.remove(ctn_DIR_ESCAPE) << Qt::endl;
 
+  /* This is the beggining of a directory traverse send, so let's put 'false' in the last value (m_singleTransfer)
+     of the header so GorgZorg can read it as "This is not a single transfer!" */
   out << qint64 (0) << qint64 (0) << m_currentFileName + "/." << false;
 
   m_totalSize += m_outBlock.size(); // The total size is the file size plus the size of the file name and other information
