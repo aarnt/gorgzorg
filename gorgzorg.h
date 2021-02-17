@@ -30,7 +30,7 @@ class QTcpServer;
 class QFile;
 class QElapsedTimer;
 
-const QString ctn_VERSION = QLatin1String("0.2.0");
+const QString ctn_VERSION = QLatin1String("0.3 (dev)");
 const QString ctn_DIR_ESCAPE = QLatin1String("<^dir$>:");
 const QString ctn_ZORGED_OK = QLatin1String("Z_OK");
 const QString ctn_ZORGED_OK_SEND = QLatin1String("Z_OK_SEND");
