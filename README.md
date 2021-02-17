@@ -31,7 +31,7 @@ $make
     -g <pathToGorg>: Set a filename or path to gorg (send)
     -h: Show this help
     -p <portnumber>: Set port to connect or listen to connections (default is 10000)
-    -q: Quit zorging after a transfer
+    -q: Quit zorging after transfer is complete
     -tar: Use tar to archive contents of path
     -v: Verbose mode. When gorging, show speed. When zorging, show bytes received
     -y: When zorging, automatically accept any incoming file/path
@@ -51,8 +51,8 @@ gorgzorg -c 192.168.1.1 -g Test
 #Send archived contents of Crucial directory to IP 172.16.20.21
 gorgzorg -c 172.16.20.21 -g Crucial -tar
 
-#Send contents of filter expression to IP 192.168.0.100
-gorgzorg -c 192.168.0.100 -g '/home/user/Pictures/*.png'
+#Send contents of filter expression in a gziped tarball to IP 192.168.0.100
+gorgzorg -c 192.168.0.100 -g '/home/user/Documents/*.txt' -zip
 
 #Start a GorgZorg server on address 192.168.10.16:20000
 gorgzorg -p 20000 -z 192.168.10.16
