@@ -20,6 +20,7 @@
 
 #include <QCoreApplication>
 #include <QTextStream>
+#include <QFileInfo>
 
 #include "gorgzorg.h"
 #include "argumentlist.h"
@@ -27,7 +28,6 @@
 int main(int argc, char *argv[])
 {
   QCoreApplication a(argc, argv);
-
   ArgumentList *argList = new ArgumentList(argc, argv);
   GorgZorg gz;
   QString target;
@@ -39,6 +39,12 @@ int main(int argc, char *argv[])
   {
     gz.showHelp();
     exit(1);
+  }
+
+  if (argList->getSwitch("-h"))
+  {
+    gz.showHelp();
+    exit(0);
   }
 
   aux = argList->getSwitchArg(QLatin1String("-p"));
@@ -56,11 +62,26 @@ int main(int argc, char *argv[])
       gz.setPort(port);
   }
 
-  if (argList->getSwitch("-v")) gz.setVerbose();
-
   if (argList->getSwitch("-y")) gz.setAlwaysAccept();
 
   if (argList->getSwitch("-q")) gz.setQuitServer();
+
+  //Has the user set a directory to copy received files?
+  if (argList->contains("-d"))
+  {
+    aux = argList->getSwitchArg(QLatin1String("-d"));
+    QFileInfo d(aux);
+
+    if (!d.isDir() || !d.exists())
+    {
+      qout << QLatin1String("ERROR: %1 is not a valid directory!").arg(aux) << Qt::endl;
+      exit(1);
+    }
+
+    gz.setZorgPath(aux);
+  }
+
+  if (argList->getSwitch("-v")) gz.setVerbose();
 
   if (argList->contains(QLatin1String("-z")))
   {
@@ -83,14 +104,8 @@ int main(int argc, char *argv[])
 
     gz.startServer(aux);
   }
-  else
+  else if (argList->contains(QLatin1String("-c")))
   {
-    if (argList->getSwitch("-h"))
-    {
-      gz.showHelp();
-      exit(0);
-    }
-
     aux = argList->getSwitchArg("-c");
     if (!aux.isEmpty())
     {
@@ -147,6 +162,11 @@ int main(int argc, char *argv[])
     {
       gz.connectAndSend(target, pathToGorg);
     }
+  }
+  else //If user did not set neither '-z' or '-c' params, let's print app help
+  {
+    gz.showHelp();
+    exit(0);
   }
 
   return a.exec();

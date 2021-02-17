@@ -57,7 +57,8 @@ private:
   QString m_currentPath;
   QString m_currentFileName;
   QString m_targetAddress;
-  QString m_archiveFileName; //Contains the random generated name of the archived path to send
+  QString m_archiveFileName;//Contains the random generated name of the archived path to send
+  QString m_zorgPath;       //Directory where the server saves received files
 
   bool m_createMasterDir;
   bool m_singleTransfer;
@@ -111,6 +112,7 @@ public:
   inline void setVerbose() { m_verbose = true; }
   inline void setAlwaysAccept() { m_alwaysAccept = true; }
   inline void setQuitServer() { m_quitServer = true; }
+  inline void setZorgPath(const QString &value) { m_zorgPath = value; }
 
 signals:
   void endTransfer();
