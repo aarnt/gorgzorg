@@ -27,7 +27,7 @@ $make
 
 ### How to use GorgZorg
 
-    -c <IP>: Set IP or name to connect to
+    -c <IP>: Set GorgZorg server IP to connect to
     -g <pathToGorg>: Set a filename or path to gorg (send)
     -h: Show this help
     -p <portnumber>: Set port to connect or listen to connections (default is 10000)

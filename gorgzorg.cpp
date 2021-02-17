@@ -1029,7 +1029,7 @@ void GorgZorg::showHelp()
 {
   QTextStream qout(stdout);
   qout << Qt::endl << QLatin1String("  GorgZorg, a simple CLI network file transfer tool") << Qt::endl;
-  qout << Qt::endl << QLatin1String("    -c <IP>: Set IP or name to connect to") << Qt::endl;
+  qout << Qt::endl << QLatin1String("    -c <IP>: Set GorgZorg server IP to connect to") << Qt::endl;
   qout << QLatin1String("    -g <pathToGorg>: Set a filename or path to gorg (send)") << Qt::endl;
   qout << QLatin1String("    -h: Show this help") << Qt::endl;
   qout << QLatin1String("    -p <portnumber>: Set port to connect or listen to connections (default is 10000)") << Qt::endl;
