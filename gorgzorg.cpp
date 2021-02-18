@@ -42,7 +42,7 @@
 /*
  * Sleeps given ms miliseconds
  */
-void qSleep(int ms)
+/*void qSleep(int ms)
 {
 #ifdef Q_OS_WIN
     Sleep(uint(ms));
@@ -50,7 +50,7 @@ void qSleep(int ms)
     struct timespec ts = { ms / 1000, (ms % 1000) * 1000 * 1000 };
     nanosleep(&ts, NULL);
 #endif
-}
+}*/
 
 /*
  * Retrieves a char from stdin, with no need for an ENTER
