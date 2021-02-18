@@ -952,11 +952,15 @@ void GorgZorg::readClient()
 
       m_currentPath.remove("../");
       m_currentPath.remove("./");
-      QProcess p;
-      QStringList params;
-      params << QLatin1String("-p");
-      params << m_currentPath;
-      p.execute(QLatin1String("mkdir"), params);
+
+      if (!m_currentPath.isEmpty())
+      {
+        QProcess p;
+        QStringList params;
+        params << QLatin1String("-p");
+        params << m_currentPath;
+        p.execute(QLatin1String("mkdir"), params);
+      }
     }
 
     if (m_receivingADir)
