@@ -29,7 +29,7 @@
 #include <QTcpServer>
 #include <QHostAddress>
 #include <QFile>
-#include <QTextCodec>
+//#include <QTextCodec>
 #include <QTextStream>
 #include <QProcess>
 #include <QDirIterator>
@@ -110,7 +110,7 @@ QString GorgZorg::getWorkingDirectory()
 
 GorgZorg::GorgZorg()
 {
-  QTextCodec::setCodecForLocale(QTextCodec::codecForName ("GBK"));
+  //QTextCodec::setCodecForLocale(QTextCodec::codecForName ("GBK"));
 
   m_tcpClient = new QTcpSocket (this);
   m_sendTimes = 0;
