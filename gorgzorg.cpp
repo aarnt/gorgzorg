@@ -29,7 +29,6 @@
 #include <QTcpServer>
 #include <QHostAddress>
 #include <QFile>
-//#include <QTextCodec>
 #include <QTextStream>
 #include <QProcess>
 #include <QDirIterator>
@@ -110,8 +109,6 @@ QString GorgZorg::getWorkingDirectory()
 
 GorgZorg::GorgZorg()
 {
-  //QTextCodec::setCodecForLocale(QTextCodec::codecForName ("GBK"));
-
   m_tcpClient = new QTcpSocket (this);
   m_sendTimes = 0;
   m_totalSent = 0;
@@ -878,7 +875,6 @@ void GorgZorg::readClient()
     {
       while(true)
       {
-        //std::cout << std::endl << "Do you want to zorg " << m_currentFileName.toLatin1().data() << " with " << strTotalSize.toLatin1().data() << " (y/n)? ";
         QString query;
 
         if (m_createMasterDir)
