@@ -1,18 +1,19 @@
 ## GorgZorg is a simple CLI network file transfer tool
 
-Do you need to copy files or folders between Unix machines but don't want to create shares?
-So, this is the tool you have been waiting for.
+Do you need to copy files or folders between Unix machines but don't want to create shares/memorize complex syntax?
+
+So, this is the tool you've been looking for.
 
 ### What you need to compile GorgZorg
 
 * QMake or CMake
-* Qt5 toolkit
+* Qt6/Qt5 toolkit
 
 ### How to compile GorgZorg using QMake
 ```
 $git clone https://github.com/aarnt/gorgzorg
 $cd gorgzorg
-$qmake-qt5
+$qmake-qt6 (or qmake-qt5)
 $make
 ```
 
