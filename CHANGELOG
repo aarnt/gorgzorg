@@ -1,6 +1,7 @@
 0.3 (dev)
   Added "-d <path>" param so users can set the directory in which 
     received files are saved.
+  Added Qt6 support.
 
 0.2.0 (2021-02-17)
   Always query user to accept/deny any incoming file/path.

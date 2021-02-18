@@ -21,8 +21,13 @@
 */
 
 #include "gorgzorg.h"
-#include <sys/ioctl.h>
-#include <termios.h>
+
+#ifndef Q_OS_WIN
+  #include <sys/ioctl.h>
+  #include <termios.h>
+#else
+  #include <conio.h>
+#endif
 
 #include <QDataStream>
 #include <QTcpSocket>
@@ -55,7 +60,7 @@
 /*
  * Retrieves a char from stdin, with no need for an ENTER
  */
-int kbhit()
+int readCharResponse()
 {
   static bool initflag = false;
   static const int STDIN = 0;
@@ -82,11 +87,21 @@ char question(const QString &strQuestion)
 {
   QTextStream(stdout) << strQuestion;
 
-  while (!kbhit()) {
+#ifndef Q_OS_WIN
+  while (!readCharResponse())
+  {
     fflush(stdout);
   }
 
   return (getchar());
+#else
+  while (!_kbhit())
+  {
+    fflush(stdout);
+  }
+
+  return = _getch();
+#endif
 }
 
 /*
@@ -98,7 +113,13 @@ QString GorgZorg::getWorkingDirectory()
   QString res;
   QProcess pwd;
   QStringList params;
+
+#ifndef Q_OS_WIN
   pwd.start(QLatin1String("pwd"), params);
+#else
+  pwd.start(QLatin1String("cd"), params);
+#endif
+
   pwd.waitForFinished(-1);
 
   res = pwd.readAllStandardOutput();
@@ -208,7 +229,7 @@ QString GorgZorg::createArchive(const QString &pathToArchive)
   if (pathToArchive.contains(QRegularExpression("\\*\\.*")))
   {
     asterisk = true;
-    int cutName=pathToArchive.size()-pathToArchive.lastIndexOf('/')-1;
+    int cutName=pathToArchive.size()-pathToArchive.lastIndexOf(QDir::separator())-1;
     filter = pathToArchive.right(cutName);
     realPath = pathToArchive.left(pathToArchive.size()-cutName);
   }
@@ -236,6 +257,7 @@ QString GorgZorg::createArchive(const QString &pathToArchive)
 
   if (asterisk)
   {
+#ifndef Q_OS_WIN
     QString findCommand = QLatin1String("find ") + realPath +
         QLatin1String(" -name ") + QLatin1String("\"") + filter + QLatin1String("\"") +
         QLatin1String(" -exec tar ") + tarParams.at(0) + QLatin1String(" ") + archiveFileName + QLatin1String(" {} +");
@@ -245,6 +267,16 @@ QString GorgZorg::createArchive(const QString &pathToArchive)
     p.execute(QLatin1String("/bin/sh"), findParams);
     p.waitForFinished(-1);
     p.close();
+#else
+    //QString findCommand = QLatin1String("find ") + realPath +
+    params << QLatin1String("-name");
+    params << filter;
+    params << QLatin1String("-exec");
+    params << QLatin1String("tar") + QLatin1String (tarParams.at(0) + QLatin1String(" ") + archiveFileName + QLatin1String(" {} +");
+    p.start(QLatin1String("find"), params);
+    p.waitForFinished(-1);
+    p.close();
+#endif
   }
   else
   {
@@ -343,7 +375,7 @@ void GorgZorg::connectAndSend(const QString &targetAddress, const QString &pathT
   if (pathToGorg.contains(QRegularExpression("\\*\\.*")))
   {
     asterisk = true;
-    int cutName=pathToGorg.size()-pathToGorg.lastIndexOf('/')-1;
+    int cutName=pathToGorg.size()-pathToGorg.lastIndexOf(QDir::separator())-1;
     filter = pathToGorg.right(cutName);
     realPath = pathToGorg.left(pathToGorg.size()-cutName);
 
@@ -583,7 +615,7 @@ void GorgZorg::sendDirHeader(const QString &filePath)
 
   /* This is the beggining of a directory traverse send, so let's put 'false' in the last value (m_singleTransfer)
      of the header so GorgZorg can read it as "This is not a single transfer!" */
-  out << qint64 (0) << qint64 (0) << m_currentFileName + "/." << false;
+  out << qint64 (0) << qint64 (0) << m_currentFileName + QDir::separator() + QLatin1String(".") << false;
 
   m_totalSize += m_outBlock.size(); // The total size is the file size plus the size of the file name and other information
   m_byteToWrite += m_outBlock.size();
@@ -843,12 +875,12 @@ void GorgZorg::readClient()
       }
     }
 
-    int cutName=m_fileName.size()-m_fileName.lastIndexOf('/')-1;
+    int cutName=m_fileName.size()-m_fileName.lastIndexOf(QDir::separator())-1;
     m_currentFileName = m_fileName.right(cutName);
 
     if (m_currentFileName == ".")
     {
-      m_currentPath = m_fileName.remove("/.");
+      m_currentPath = m_fileName.remove(QString(QDir::separator())+QLatin1String("."));
       m_currentFileName = m_currentPath;
       m_createMasterDir = true;
     }
@@ -922,9 +954,15 @@ void GorgZorg::readClient()
     {
       QProcess p;
       QStringList params;
+
+#ifndef Q_OS_WIN
       params << QLatin1String("-p");
       params << m_currentPath;
       p.execute(QLatin1String("mkdir"), params);
+#else
+      params << m_currentPath;
+      p.execute(QLatin1String("md"), params);
+#endif
 
       m_byteReceived = 0;
       m_totalSize = 0;
@@ -943,12 +981,22 @@ void GorgZorg::readClient()
 
     if (!m_currentPath.isEmpty())
     {
-      if (m_currentPath.startsWith("/"))  //test code
+#ifndef Q_OS_WIN
+      if (m_currentPath.startsWith(QDir::separator()))
         m_currentPath.remove(0,1);
+#else
+      QString drive;
+      int s = m_currentPath.indexOf(QDir::separator());
+      if (s > 0)
+      {
+        drive = m_currentPath.left(s+1);
+        m_currentPath.remove(drive);
+      }
+#endif
+      m_currentPath.remove(QLatin1String("..") + QString(QDir::separator()));
+      m_currentPath.remove(QLatin1String(".") + QString(QDir::separator()));
 
-      m_currentPath.remove("../");
-      m_currentPath.remove("./");
-
+#ifndef Q_OS_WIN
       if (!m_currentPath.isEmpty())
       {
         QProcess p;
@@ -957,15 +1005,30 @@ void GorgZorg::readClient()
         params << m_currentPath;
         p.execute(QLatin1String("mkdir"), params);
       }
+#else
+      if (!m_currentPath.isEmpty())
+      {
+        QProcess p;
+        QStringList params;
+        params << m_currentPath;
+        p.execute(QLatin1String("md"), params);
+      }
+#endif
     }
 
     if (m_receivingADir)
     {
       QProcess p;
       QStringList params;
+
+#ifndef Q_OS_WIN
       params << QLatin1String("-p");
       params << m_currentPath + QDir::separator() + m_currentFileName;
       p.execute(QLatin1String("mkdir"), params);
+#else
+      params << m_currentPath + QDir::separator() + m_currentFileName;
+      p.execute(QLatin1String("md"), params);
+#endif
 
       m_inBlock = m_receivedSocket->readAll();
       m_byteReceived += m_inBlock.size();
