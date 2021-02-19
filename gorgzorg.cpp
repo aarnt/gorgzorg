@@ -268,7 +268,7 @@ QString GorgZorg::createArchive(const QString &pathToArchive)
     p.waitForFinished(-1);
     p.close();
 #else
-    //QString findCommand = QLatin1String("find ") + realPath +
+    params << realPath;
     params << QLatin1String("-name");
     params << filter;
     params << QLatin1String("-exec");
@@ -306,13 +306,13 @@ void GorgZorg::removeArchive()
  */
 bool GorgZorg::prepareToSendFile(const QString &fName)
 {
+  QTextStream qout(stdout);
   m_fileName = fName;
   m_loadSize = 0;
   m_byteToWrite = 0;
   m_totalSize = 0;
   m_outBlock.clear();
   m_sendingADir = false;
-  QTextStream qout(stdout);
 
   if (fName.startsWith(ctn_DIR_ESCAPE))
   {
@@ -587,10 +587,10 @@ void GorgZorg::sendFileHeader(const QString &filePath)
  */
 void GorgZorg::sendDirHeader(const QString &filePath)
 {
+  QTextStream qout(stdout);
   m_fileName = filePath;
   m_outBlock.clear();
   m_sendingADir = true;
-  QTextStream qout(stdout);
 
   m_localFile = new QFile(m_fileName);
   m_tcpClient->connectToHost(QHostAddress(m_targetAddress), m_port);
@@ -688,7 +688,6 @@ void GorgZorg::sendFileBody()
 void GorgZorg::send()
 {
   QTextStream qout(stdout);
-
   m_loadSize = 4 * 1024; // The size of data sent each time
 
   if (m_sendingADir)
