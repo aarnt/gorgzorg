@@ -57,6 +57,7 @@
 #endif
 }*/
 
+#ifndef Q_OS_WIN
 /*
  * Retrieves a char from stdin, with no need for an ENTER
  */
@@ -79,6 +80,7 @@ int readCharResponse()
   ioctl(STDIN, FIONREAD, &nbbytes);  // 0 is STDIN
   return nbbytes;
 }
+#endif
 
 /*
  * Asks user about strQuestion. The reply will be just 1 char size
@@ -100,7 +102,7 @@ char question(const QString &strQuestion)
     fflush(stdout);
   }
 
-  return = _getch();
+  return _getch();
 #endif
 }
 
@@ -268,12 +270,12 @@ QString GorgZorg::createArchive(const QString &pathToArchive)
     p.waitForFinished(-1);
     p.close();
 #else
-    params << realPath;
-    params << QLatin1String("-name");
-    params << filter;
-    params << QLatin1String("-exec");
-    params << QLatin1String("tar") + QLatin1String (tarParams.at(0) + QLatin1String(" ") + archiveFileName + QLatin1String(" {} +");
-    p.start(QLatin1String("find"), params);
+    findParams << realPath;
+    findParams << QLatin1String("-name");
+    findParams << filter;
+    findParams << QLatin1String("-exec");
+    findParams << QLatin1String("tar") + QString(tarParams.at(0)) + QLatin1String(" ") + archiveFileName + QLatin1String(" {} +");
+    p.start(QLatin1String("find"), findParams);
     p.waitForFinished(-1);
     p.close();
 #endif
