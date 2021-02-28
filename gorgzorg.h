@@ -59,6 +59,7 @@ private:
   QString m_targetAddress;
   QString m_archiveFileName;//Contains the random generated name of the archived path to send
   QString m_zorgPath;       //Directory where the server saves received files
+  QString m_masterDir;      //Directory which contains the path being received
 
   bool m_createMasterDir;
   bool m_singleTransfer;

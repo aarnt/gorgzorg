@@ -853,6 +853,7 @@ void GorgZorg::readClient()
 
     if (m_fileName == ctn_END_OF_TRANSFER)
     {
+      m_masterDir.clear();
       m_byteReceived = 0;
       m_totalSize = 0;
 
@@ -876,6 +877,23 @@ void GorgZorg::readClient()
       }
     }
 
+    //Check if we have to replace directory separators
+    QChar here = QDir::separator();
+    int i=m_fileName.indexOf(here);
+
+    if (i == -1)
+    {
+      if (here == '/')
+      {
+        m_fileName.replace(QChar('\\'), QChar('/'));
+      }
+      else
+      {
+        m_fileName.replace(QChar('/'), QChar('\\'));
+      }
+    }
+
+    //qout << Qt::endl << QLatin1String("Received: %1").arg(m_fileName) << Qt::endl;
     int cutName=m_fileName.size()-m_fileName.lastIndexOf(QDir::separator())-1;
     m_currentFileName = m_fileName.right(cutName);
 
@@ -953,16 +971,18 @@ void GorgZorg::readClient()
 
     if (m_createMasterDir)
     {
-      QProcess p;
-      QStringList params;
 
 #ifndef Q_OS_WIN
+      QProcess p;
+      QStringList params;
       params << QLatin1String("-p");
       params << m_currentPath;
       p.execute(QLatin1String("mkdir"), params);
 #else
-      params << m_currentPath;
-      p.execute(QLatin1String("md"), params);
+      QDir daux;
+      daux.mkpath(m_currentPath);
+      //qout << QLatin1String("Master DIR: %1").arg(m_currentPath) << Qt::endl;
+      m_masterDir = m_currentPath;
 #endif
 
       m_byteReceived = 0;
@@ -1009,26 +1029,32 @@ void GorgZorg::readClient()
 #else
       if (!m_currentPath.isEmpty())
       {
-        QProcess p;
-        QStringList params;
-        params << m_currentPath;
-        p.execute(QLatin1String("md"), params);
+        QDir daux;
+        if (!m_masterDir.isEmpty()) m_currentPath = m_masterDir + m_currentPath;
+        daux.mkpath(m_currentPath);
       }
 #endif
     }
 
     if (m_receivingADir)
     {
-      QProcess p;
-      QStringList params;
 
 #ifndef Q_OS_WIN
+      QProcess p;
+      QStringList params;
       params << QLatin1String("-p");
       params << m_currentPath + QDir::separator() + m_currentFileName;
       p.execute(QLatin1String("mkdir"), params);
 #else
-      params << m_currentPath + QDir::separator() + m_currentFileName;
-      p.execute(QLatin1String("md"), params);
+      QDir daux;
+      if (!m_masterDir.isEmpty())
+      {
+        if (!m_currentPath.startsWith(m_masterDir))
+          m_currentPath = m_masterDir + m_currentPath;
+      }
+
+      //qout << QLatin1String("Creating DIR: %1").arg(m_currentPath) << Qt::endl;
+      daux.mkpath(m_currentPath + QDir::separator() + m_currentFileName);
 #endif
 
       m_inBlock = m_receivedSocket->readAll();
@@ -1037,9 +1063,31 @@ void GorgZorg::readClient()
     else
     {
       if (m_currentPath.isEmpty())
+      {
+#ifndef Q_OS_WIN
         m_newFile = new QFile(m_currentFileName);
+#else
+        if (!m_masterDir.isEmpty()) m_currentFileName = m_masterDir + m_currentFileName;
+
+        //qout << QLatin1String("Creating file: %1").arg(m_currentFileName) << Qt::endl;
+        m_newFile = new QFile(m_currentFileName);
+#endif
+      }
       else
+      {
+#ifndef Q_OS_WIN
         m_newFile = new QFile(m_currentPath + QDir::separator() + m_currentFileName);
+#else
+        if (!m_masterDir.isEmpty())
+        {
+          if (!m_currentPath.startsWith(m_masterDir))
+            m_currentPath = m_masterDir + m_currentPath;
+        }
+
+        //qout << QLatin1String("Creating file: %1").arg(m_currentPath + m_currentFileName) << Qt::endl;
+        m_newFile = new QFile(m_currentPath + QDir::separator() + m_currentFileName);
+#endif
+      }
 
       m_newFile->open(QFile::WriteOnly);
       m_inBlock = m_receivedSocket->readAll();
