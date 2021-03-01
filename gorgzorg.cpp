@@ -593,7 +593,6 @@ void GorgZorg::sendDirHeader(const QString &filePath)
   m_fileName = filePath;
   m_outBlock.clear();
   m_sendingADir = true;
-
   m_localFile = new QFile(m_fileName);
   m_tcpClient->connectToHost(QHostAddress(m_targetAddress), m_port);
   m_tcpClient->waitForConnected(-1);
@@ -946,6 +945,7 @@ void GorgZorg::readClient()
         {
           qout << Qt::endl << QLatin1String("Sending CANCEL_SEND...") << Qt::endl;
           m_receivedSocket->write(ctn_ZORGED_CANCEL_SEND.toLatin1());
+          m_receivedSocket->waitForBytesWritten(-1);
           m_byteReceived = 0;
           m_totalSize = 0;
 
@@ -991,6 +991,7 @@ void GorgZorg::readClient()
       //Send an OK to the other side
       qout << QLatin1String("Zorging of master directory completed") << Qt::endl;
       m_receivedSocket->write(ctn_ZORGED_OK.toLatin1());
+      m_receivedSocket->waitForBytesWritten(-1);
 
       if (m_singleTransfer == false && m_askForAccept == false)
         m_askForAccept = true;
@@ -1139,6 +1140,7 @@ void GorgZorg::readClient()
 
     //Send an OK to the other side
     m_receivedSocket->write(ctn_ZORGED_OK.toLatin1());
+    m_receivedSocket->waitForBytesWritten(-1);
   }
 }
 
