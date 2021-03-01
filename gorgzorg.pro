@@ -6,6 +6,7 @@ TEMPLATE = app
 TARGET = gorgzorg
 INCLUDEPATH += .
 QT += core network
+QT -= gui
 CONFIG += cmdline
 
 # You can make your code fail to compile if you use deprecated APIs.

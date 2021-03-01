@@ -154,7 +154,7 @@ int main(int argc, char *argv[])
     }
     else
     {
-      qout << QLatin1String("ERROR: You should specify a relative filename or relative path to gorg (send)!") << Qt::endl;
+      qout << QLatin1String("ERROR: You should specify a filename or path to gorg (send)!") << Qt::endl;
       exit(1);
     }
 
