@@ -154,10 +154,11 @@ GorgZorg::GorgZorg()
  */
 void GorgZorg::readResponse()
 {
-  QTextStream qout(stdout);
+  QTextStream qout(stdout); 
 
   //What did we receive from the server?
   QString ret = m_tcpClient->readAll();
+  //qout << QLatin1String("Received response: %1").arg(ret) << Qt::endl;
 
   if (ret == ctn_ZORGED_OK)
   {
@@ -168,6 +169,13 @@ void GorgZorg::readResponse()
   {
     qout << QLatin1String("Zorged OK SEND received") << Qt::endl;
     emit okSend();
+  }
+  else if (ret == ctn_ZORGED_OK_SEND_AND_ZORGED_OK) //The two previous msgs may arrive truncated!
+  {
+    emit okSend();
+    emit endTransfer();
+    qout << QLatin1String("Zorged OK SEND received") << Qt::endl;
+    qout << QLatin1String("Zorged OK received") << Qt::endl;
   }
   else if (ret == ctn_ZORGED_CANCEL_SEND)
   {

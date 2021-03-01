@@ -34,6 +34,7 @@ const QString ctn_VERSION = QLatin1String("0.3 (dev)");
 const QString ctn_DIR_ESCAPE = QLatin1String("<^dir$>:");
 const QString ctn_ZORGED_OK = QLatin1String("Z_OK");
 const QString ctn_ZORGED_OK_SEND = QLatin1String("Z_OK_SEND");
+const QString ctn_ZORGED_OK_SEND_AND_ZORGED_OK = QLatin1String("Z_OK_SENDZ_OK");
 const QString ctn_ZORGED_CANCEL_SEND = QLatin1String("Z_KO_SEND");
 const QString ctn_END_OF_TRANSFER = QLatin1String("<[--Finis_tr@nslationi$--]>");
 
