@@ -53,7 +53,6 @@ private:
   QByteArray m_inBlock;
   QFile *m_localFile;
   QFile *m_newFile;
-
   QString m_fileName;
   QString m_currentPath;
   QString m_currentFileName;
@@ -82,6 +81,7 @@ private:
   int m_port;
   int m_sendTimes;          //Used to mark whether to send for the first time, after the first connection signal is triggered, followed by manually calling
 
+  QString getShell();
   QString createArchive(const QString &pathToArchive);
   bool prepareToSendFile(const QString &fName);
   void sendFile(const QString &filePath);

@@ -227,6 +227,16 @@ bool GorgZorg::isLocalIP(const QString &ip)
 }
 
 /*
+ * Returns the SHELL environment variable, if not set defaults to sh.
+ */
+QString GorgZorg::getShell()
+{
+  QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+  QString shell = env.value(QStringLiteral("SHELL"), QStringLiteral("/bin/sh"));
+  return shell;
+}
+
+/*
  * Creates a ".tar" or ".tar.gz" archive to send based on "-tar"/"-zip" command line params
  */
 QString GorgZorg::createArchive(const QString &pathToArchive)
@@ -250,12 +260,7 @@ QString GorgZorg::createArchive(const QString &pathToArchive)
     qout << Qt::endl << QLatin1String("Archiving %1").arg(pathToArchive);
 
   quint32 gen = QRandomGenerator::global()->generate();
-  QString archiveFileName = QLatin1String("gorged_%1.tar").arg(QString::number(gen));
-
-  if (m_zipContents)
-  {
-    archiveFileName += QLatin1String(".gz");
-  }
+  QString archiveFileName = QLatin1String("gorged_%1").arg(QString::number(gen));
 
   QProcess p;
   QStringList tarParams, findParams;
@@ -268,23 +273,48 @@ QString GorgZorg::createArchive(const QString &pathToArchive)
   if (asterisk)
   {
 #ifndef Q_OS_WIN
+    if (m_zipContents)
+    {
+      archiveFileName += QLatin1String(".tar.gz");
+    }
+    else
+    {
+      archiveFileName += QLatin1String(".tar");
+    }
+
     QString findCommand = QLatin1String("find ") + realPath +
         QLatin1String(" -name ") + QLatin1String("\"") + filter + QLatin1String("\"") +
         QLatin1String(" -exec tar ") + tarParams.at(0) + QLatin1String(" ") + archiveFileName + QLatin1String(" {} +");
 
     findParams << QLatin1String("-c");
     findParams << findCommand;
-    p.execute(QLatin1String("/bin/sh"), findParams);
+    p.execute(getShell(), findParams);
     p.waitForFinished(-1);
     p.close();
 #else
-    findParams << realPath;
-    findParams << QLatin1String("-name");
-    findParams << filter;
-    findParams << QLatin1String("-exec");
-    findParams << QLatin1String("tar") + QString(tarParams.at(0)) + QLatin1String(" ") + archiveFileName + QLatin1String(" {} +");
-    p.start(QLatin1String("find"), findParams);
+    realPath.remove(QChar('\''));
+    filter.remove(QChar('\''));
+
+    QString compressionLevel;
+    if (m_zipContents)
+    {
+      compressionLevel = "Fastest";
+    }
+    else
+    {
+      compressionLevel = "NoCompression";
+    }
+
+    archiveFileName += QLatin1String(".zip");
+
+    //Get-ChildItem c:\temp\*.dll -Recurse | Compress-Archive -Update -CompressionLevel NoCompression -DestinationPath c:\temp\power.zip
+    QString params = "powershell.exe -Command \"Get-ChildItem " + realPath + filter +
+        " -Recurse | Compress-Archive -Update -CompressionLevel " + compressionLevel +
+        " -DestinationPath .\\" + archiveFileName + "\"";
+    p.start(params);
     p.waitForFinished(-1);
+    //qout << Qt::endl << QLatin1String("powershell command: %1").arg(params) << Qt::endl;
+    //qout << Qt::endl << QLatin1String("powershell output: %1").arg(p.readAllStandardOutput()) << Qt::endl;
     p.close();
 #endif
   }
@@ -305,7 +335,9 @@ QString GorgZorg::createArchive(const QString &pathToArchive)
  */
 void GorgZorg::removeArchive()
 {
-  if (QFile::exists(m_archiveFileName) && (m_archiveFileName.endsWith(".tar") || m_archiveFileName.endsWith(".tar.gz")))
+  if (QFile::exists(m_archiveFileName) &&
+      (m_archiveFileName.endsWith(".tar") || m_archiveFileName.endsWith(".tar.gz") ||
+      m_archiveFileName.endsWith(".zip")))
   {
     QFile::remove(m_archiveFileName);
   }
@@ -388,6 +420,14 @@ void GorgZorg::connectAndSend(const QString &targetAddress, const QString &pathT
     int cutName=pathToGorg.size()-pathToGorg.lastIndexOf(QDir::separator())-1;
     filter = pathToGorg.right(cutName);
     realPath = pathToGorg.left(pathToGorg.size()-cutName);
+
+#ifdef Q_OS_WIN
+    filter.remove(QChar('\''));
+    realPath.remove(QChar('\''));
+#endif
+
+    //qout << Qt::endl << QLatin1String("Filter: %1").arg(filter) << Qt::endl;
+    //qout << Qt::endl << QLatin1String("Real Path: %1").arg(realPath) << Qt::endl;
 
     if (realPath.isEmpty())
       realPath = getWorkingDirectory();
