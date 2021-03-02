@@ -60,6 +60,7 @@ private:
   QString m_archiveFileName;//Contains the random generated name of the archived path to send
   QString m_zorgPath;       //Directory where the server saves received files
   QString m_masterDir;      //Directory which contains the path being received
+  QString m_winDrive;       //When running on Windows, this member holds the path drive (ex: "C:\")
 
   bool m_createMasterDir;
   bool m_singleTransfer;
@@ -83,6 +84,7 @@ private:
 
   QString getShell();
   QString createArchive(const QString &pathToArchive);
+
   bool prepareToSendFile(const QString &fName);
   void sendFile(const QString &filePath);
   void sendFileHeader(const QString &filePath);

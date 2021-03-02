@@ -39,7 +39,7 @@
 #include <QDirIterator>
 #include <QEventLoop>
 #include <QNetworkInterface>
-#include <QRandomGenerator>
+//#include <QRandomGenerator>
 #include <QRegularExpression>
 #include <QElapsedTimer>
 #include <iostream>
@@ -259,11 +259,15 @@ QString GorgZorg::createArchive(const QString &pathToArchive)
   else
     qout << Qt::endl << QLatin1String("Archiving %1").arg(pathToArchive);
 
-  quint32 gen = QRandomGenerator::global()->generate();
-  QString archiveFileName = QLatin1String("gorged_%1").arg(QString::number(gen));
+  QTime time = QTime::currentTime();
+  //quint32 gen = time.minute() + time.second() + time.msec(); //QRandomGenerator::global()->generate();
+  QString random = QString::number(time.minute()) +
+      QString::number(time.second()) +
+      QString::number(time.msec());
+  QString archiveFileName = QLatin1String("gorged_%1").arg(random);
 
   QProcess p;
-  QStringList tarParams, findParams;
+  QStringList tarParams;
 
   if (m_zipContents)
     tarParams << QLatin1String("-czf");
@@ -282,6 +286,7 @@ QString GorgZorg::createArchive(const QString &pathToArchive)
       archiveFileName += QLatin1String(".tar");
     }
 
+    QStringList findParams;
     QString findCommand = QLatin1String("find ") + realPath +
         QLatin1String(" -name ") + QLatin1String("\"") + filter + QLatin1String("\"") +
         QLatin1String(" -exec tar ") + tarParams.at(0) + QLatin1String(" ") + archiveFileName + QLatin1String(" {} +");
@@ -298,24 +303,52 @@ QString GorgZorg::createArchive(const QString &pathToArchive)
     QString compressionLevel;
     if (m_zipContents)
     {
-      compressionLevel = "Fastest";
+      compressionLevel = "-mx1";
     }
     else
     {
-      compressionLevel = "NoCompression";
+      compressionLevel = "-mx0";
     }
 
-    archiveFileName += QLatin1String(".zip");
+    archiveFileName += QLatin1String(".7z");
 
     //Get-ChildItem c:\temp\*.dll -Recurse | Compress-Archive -Update -CompressionLevel NoCompression -DestinationPath c:\temp\power.zip
-    QString params = "powershell.exe -Command \"Get-ChildItem " + realPath + filter +
+    /*QString params = "powershell.exe -Command \"Get-ChildItem " + realPath + filter +
         " -Recurse | Compress-Archive -Update -CompressionLevel " + compressionLevel +
-        " -DestinationPath .\\" + archiveFileName + "\"";
-    p.start(params);
-    p.waitForFinished(-1);
+        " -DestinationPath .\\" + archiveFileName + "\"";*/
+
     //qout << Qt::endl << QLatin1String("powershell command: %1").arg(params) << Qt::endl;
     //qout << Qt::endl << QLatin1String("powershell output: %1").arg(p.readAllStandardOutput()) << Qt::endl;
-    p.close();
+
+    //First, let's find where 7zip is located
+    QStringList wp;
+    wp << "/R" << "\\Program Files" << "7z.exe";
+    p.start("where", wp);
+    p.waitForFinished(-1);
+
+    QString pathTo7zip = p.readAllStandardOutput();
+    pathTo7zip.remove("\r\n");
+    //qout << Qt::endl << QLatin1String("where output: %1").arg(pathTo7zip);
+
+    if (!pathTo7zip.contains("7z.exe"))
+    {
+      wp << "/R" << "\\Program Files (x86)" << "7z.exe";
+      p.start("where", wp);
+      p.waitForFinished(-1);
+      pathTo7zip = p.readAllStandardOutput();
+      pathTo7zip.remove("\r\n");
+      //qout << Qt::endl << QLatin1String("where output: %1").arg(pathTo7zip);
+    }
+
+    if (pathTo7zip.contains("7z.exe"))
+    {
+      //"c:\Program Files\7-Zip\7z.exe" a c:\temp\test10.7zip c:\Qt\6.0.1\*.dll -r -mx1
+      QString params = "\"" + pathTo7zip + "\" a " + archiveFileName + " " + realPath + filter + " -r " + compressionLevel;
+      p.start(params);
+      p.waitForFinished(-1);
+      p.close();
+    }
+
 #endif
   }
   else
@@ -337,7 +370,7 @@ void GorgZorg::removeArchive()
 {
   if (QFile::exists(m_archiveFileName) &&
       (m_archiveFileName.endsWith(".tar") || m_archiveFileName.endsWith(".tar.gz") ||
-      m_archiveFileName.endsWith(".zip")))
+      m_archiveFileName.endsWith(".7z")))
   {
     QFile::remove(m_archiveFileName);
   }
@@ -940,7 +973,14 @@ void GorgZorg::readClient()
       }
     }
 
-    //qout << Qt::endl << QLatin1String("Received: %1").arg(m_fileName) << Qt::endl;
+#ifdef Q_OS_WIN
+    if (m_fileName.startsWith(QDir::separator()))
+    {
+      m_fileName.remove(0, 1);
+    }
+#endif
+
+    qout << Qt::endl << QLatin1String("Received: %1").arg(m_fileName) << Qt::endl;
     int cutName=m_fileName.size()-m_fileName.lastIndexOf(QDir::separator())-1;
     m_currentFileName = m_fileName.right(cutName);
 
@@ -951,7 +991,10 @@ void GorgZorg::readClient()
       m_createMasterDir = true;
     }
     else
+    {
       m_currentPath = m_fileName.left(m_fileName.size()-cutName);
+      //qout << QLatin1String("First Path: %1").arg(m_currentPath) << Qt::endl;
+    }
 
     if (!m_createMasterDir)
     {
@@ -1013,6 +1056,13 @@ void GorgZorg::readClient()
     {
       m_receivingADir = true;
       m_currentPath.remove(ctn_DIR_ESCAPE);
+
+#ifdef Q_OS_WIN
+      if (m_currentPath.startsWith(QDir::separator()))
+      {
+        m_currentPath.remove(0, 1);
+      }
+#endif
     }
 
     qout << Qt::endl << QLatin1String("Zorging %1").arg(m_currentFileName) << Qt::endl;
@@ -1055,12 +1105,16 @@ void GorgZorg::readClient()
       if (m_currentPath.startsWith(QDir::separator()))
         m_currentPath.remove(0,1);
 #else
-      QString drive;
-      int s = m_currentPath.indexOf(QDir::separator());
-      if (s > 0)
+      bool hasDrive=m_currentPath.contains(QLatin1Char(':'));
+
+      if (hasDrive)
       {
-        drive = m_currentPath.left(s+1);
-        m_currentPath.remove(drive);
+        int s = m_currentPath.indexOf(QDir::separator());
+        if (s > -1)
+        {
+          m_winDrive = m_currentPath.left(s+1);
+          m_currentPath.remove(m_winDrive);
+        }
       }
 #endif
       m_currentPath.remove(QLatin1String("..") + QString(QDir::separator()));
@@ -1079,7 +1133,11 @@ void GorgZorg::readClient()
       if (!m_currentPath.isEmpty())
       {
         QDir daux;
-        if (!m_masterDir.isEmpty()) m_currentPath = m_masterDir + m_currentPath;
+        if (!m_masterDir.isEmpty())
+        {
+          if (!QString(m_winDrive+m_currentPath).startsWith(m_masterDir))
+            m_currentPath = m_masterDir + m_currentPath;
+        }
         daux.mkpath(m_currentPath);
       }
 #endif
@@ -1098,7 +1156,7 @@ void GorgZorg::readClient()
       QDir daux;
       if (!m_masterDir.isEmpty())
       {
-        if (!m_currentPath.startsWith(m_masterDir))
+        if (!QString(m_winDrive+m_currentPath).startsWith(m_masterDir))
           m_currentPath = m_masterDir + m_currentPath;
       }
 
@@ -1116,7 +1174,11 @@ void GorgZorg::readClient()
 #ifndef Q_OS_WIN
         m_newFile = new QFile(m_currentFileName);
 #else
-        if (!m_masterDir.isEmpty()) m_currentFileName = m_masterDir + m_currentFileName;
+        if (!m_masterDir.isEmpty())
+        {
+          if (!QString(m_winDrive+m_currentFileName).startsWith(m_masterDir))
+            m_currentFileName = m_masterDir + m_currentFileName;
+        }
 
         //qout << QLatin1String("Creating file: %1").arg(m_currentFileName) << Qt::endl;
         m_newFile = new QFile(m_currentFileName);
@@ -1129,7 +1191,7 @@ void GorgZorg::readClient()
 #else
         if (!m_masterDir.isEmpty())
         {
-          if (!m_currentPath.startsWith(m_masterDir))
+          if (!QString(m_winDrive+m_currentPath).startsWith(m_masterDir))
             m_currentPath = m_masterDir + m_currentPath;
         }
 
@@ -1137,6 +1199,10 @@ void GorgZorg::readClient()
         m_newFile = new QFile(m_currentPath + QDir::separator() + m_currentFileName);
 #endif
       }
+
+      //TODO: remove
+      //qout << Qt::endl << QLatin1String("Path: %1").arg(m_currentPath) << Qt::endl;
+      //qout << QLatin1String("FileName: %1").arg(m_currentFileName) << Qt::endl;
 
       m_newFile->open(QFile::WriteOnly);
       m_inBlock = m_receivedSocket->readAll();
