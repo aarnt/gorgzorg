@@ -353,6 +353,15 @@ QString GorgZorg::createArchive(const QString &pathToArchive)
   }
   else
   {
+    if (m_zipContents)
+    {
+      archiveFileName += QLatin1String(".tar.gz");
+    }
+    else
+    {
+      archiveFileName += QLatin1String(".tar");
+    }
+
     tarParams << archiveFileName;
     tarParams << pathToArchive;
     p.execute(QLatin1String("tar"), tarParams);
@@ -980,7 +989,7 @@ void GorgZorg::readClient()
     }
 #endif
 
-    qout << Qt::endl << QLatin1String("Received: %1").arg(m_fileName) << Qt::endl;
+    //qout << Qt::endl << QLatin1String("Received: %1").arg(m_fileName) << Qt::endl;
     int cutName=m_fileName.size()-m_fileName.lastIndexOf(QDir::separator())-1;
     m_currentFileName = m_fileName.right(cutName);
 
@@ -1200,7 +1209,6 @@ void GorgZorg::readClient()
 #endif
       }
 
-      //TODO: remove
       //qout << Qt::endl << QLatin1String("Path: %1").arg(m_currentPath) << Qt::endl;
       //qout << QLatin1String("FileName: %1").arg(m_currentFileName) << Qt::endl;
 
