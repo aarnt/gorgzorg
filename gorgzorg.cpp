@@ -21,6 +21,7 @@
 */
 
 #include "gorgzorg.h"
+#include <iostream>
 
 #ifndef Q_OS_WIN
   #include <sys/ioctl.h>
@@ -154,33 +155,31 @@ GorgZorg::GorgZorg()
  */
 void GorgZorg::readResponse()
 {
-  QTextStream qout(stdout); 
-
   //What did we receive from the server?
   QString ret = m_tcpClient->readAll();
-  //qout << QLatin1String("Received response: %1").arg(ret) << Qt::endl;
+  //std::cout << "Received response: " << ret.toLatin1().data() << std::endl;
 
   if (ret == ctn_ZORGED_OK)
   {
-    qout << QLatin1String("Zorged OK received") << Qt::endl;
+    std::cout << "Zorged OK received" << std::endl;
     emit endTransfer();
   }
   else if (ret == ctn_ZORGED_OK_SEND)
   {
-    qout << QLatin1String("Zorged OK SEND received") << Qt::endl;
+    std::cout << "Zorged OK SEND received" << std::endl;
     emit okSend();
   }
   else if (ret == ctn_ZORGED_OK_SEND_AND_ZORGED_OK) //The two previous msgs may arrive truncated!
   {
     emit okSend();
     emit endTransfer();
-    qout << QLatin1String("Zorged OK SEND received") << Qt::endl;
-    qout << QLatin1String("Zorged OK received") << Qt::endl;
+    std::cout << "Zorged OK SEND received" << std::endl;
+    std::cout << "Zorged OK received" << std::endl;
   }
   else if (ret == ctn_ZORGED_CANCEL_SEND)
   {
     removeArchive();
-    qout << QLatin1String("Zorged CANCEL received. Aborting send!") << Qt::endl;
+    std::cout << "Zorged CANCEL received. Aborting send!" << std::endl;
     exit(0);
   }
 }
@@ -241,7 +240,6 @@ QString GorgZorg::getShell()
  */
 QString GorgZorg::createArchive(const QString &pathToArchive)
 {
-  QTextStream qout(stdout);
   bool asterisk = false;
   QString realPath;
   QString filter;
@@ -255,9 +253,9 @@ QString GorgZorg::createArchive(const QString &pathToArchive)
   }
 
   if (m_zipContents)
-    qout << Qt::endl << QLatin1String("Compressing %1").arg(pathToArchive);
+    std::cout << std::endl << "Compressing " << pathToArchive.toLatin1().data();
   else
-    qout << Qt::endl << QLatin1String("Archiving %1").arg(pathToArchive);
+    std::cout << std::endl << "Archiving " << pathToArchive.toLatin1().data();
 
   QTime time = QTime::currentTime();
   //quint32 gen = time.minute() + time.second() + time.msec(); //QRandomGenerator::global()->generate();
@@ -390,7 +388,6 @@ void GorgZorg::removeArchive()
  */
 bool GorgZorg::prepareToSendFile(const QString &fName)
 {
-  QTextStream qout(stdout);
   m_fileName = fName;
   m_loadSize = 0;
   m_byteToWrite = 0;
@@ -407,7 +404,7 @@ bool GorgZorg::prepareToSendFile(const QString &fName)
     m_localFile = new QFile(m_fileName);
     if (!m_localFile->open(QFile::ReadOnly))
     {
-      qout << Qt::endl << QLatin1String("ERROR: %1 could not be opened").arg(m_fileName) << Qt::endl;
+      std::cout << std::endl << "ERROR: " << m_fileName.toLatin1().data() << " could not be opened" << std::endl;
       return false;
     }
   }
@@ -449,7 +446,6 @@ void GorgZorg::sendFile(const QString &filePath)
  */
 void GorgZorg::connectAndSend(const QString &targetAddress, const QString &pathToGorg)
 {
-  QTextStream qout(stdout);
   m_targetAddress = targetAddress;
   QFileInfo fi(pathToGorg);
   bool asterisk = false;
@@ -477,7 +473,7 @@ void GorgZorg::connectAndSend(const QString &targetAddress, const QString &pathT
 
   if (!asterisk && !fi.exists())
   {
-    qout << Qt::endl << QLatin1String("ERROR: %1 could not be found!").arg(pathToGorg) << Qt::endl;
+    std::cout << std::endl << "ERROR: " << pathToGorg.toLatin1().data() << " could not be found!" << std::endl;
     exit(1);
   }
 
@@ -553,13 +549,13 @@ void GorgZorg::connectAndSend(const QString &targetAddress, const QString &pathT
     QString strBytesSent = QString::number(bytesSent, 'f', 2);
     QString strSpeed = QString::number(speed, 'f', 2);
 
-    qout << Qt::endl << QLatin1String("Time elapsed: %1s").arg(strDuration) << Qt::endl;
-    qout << QLatin1String("Bytes sent: %1 MB").arg(strBytesSent) << Qt::endl;
-    qout << QLatin1String("Speed: %1 MB/s").arg(strSpeed) << Qt::endl;
+    std::cout << std::endl << "Time elapsed: " << strDuration.toLatin1().data() << "s" << std::endl;
+    std::cout << "Bytes sent: " << strBytesSent.toLatin1().data() << " MB" << std::endl;
+    std::cout << "Speed: " << strSpeed.toLatin1().data() << " MB/s" << std::endl;
   }
 
   removeArchive();
-  qout << Qt::endl;
+  std::cout << std::endl;
   exit(0);
 }
 
@@ -568,7 +564,6 @@ void GorgZorg::connectAndSend(const QString &targetAddress, const QString &pathT
  */
 void GorgZorg::sendEndOfTransfer()
 {
-  QTextStream qout(stdout);
   QObject::disconnect(m_tcpClient, &QTcpSocket::bytesWritten, this, &GorgZorg::goOnSend);
 
   //Tests if client is connected before going on
@@ -584,7 +579,7 @@ void GorgZorg::sendEndOfTransfer()
 
   QDataStream out(&m_outBlock, QIODevice::WriteOnly);
   m_currentFileName = ctn_END_OF_TRANSFER;
-  qout << Qt::endl << QLatin1String("Gorging goodbye...") << Qt::endl;
+  std::cout << std::endl << "Gorging goodbye..." << std::endl;
 
   out << qint64(0) << qint64(0) << m_currentFileName << true;
 
@@ -604,8 +599,6 @@ void GorgZorg::sendEndOfTransfer()
  */
 void GorgZorg::sendFileHeader(const QString &filePath)
 {
-  QTextStream qout(stdout);
-
   if (prepareToSendFile(filePath))
   {
     m_tcpClient->connectToHost(QHostAddress(m_targetAddress), m_port);
@@ -613,7 +606,8 @@ void GorgZorg::sendFileHeader(const QString &filePath)
 
     if (m_tcpClient->state() == QAbstractSocket::UnconnectedState)
     {
-      qout << Qt::endl << QLatin1String("ERROR: It seems there is no one zorging on %1:%2").arg(m_targetAddress).arg(m_port) << Qt::endl;
+      std::cout << std::endl << "ERROR: It seems there is no one zorging on " <<
+                   m_targetAddress.toLatin1().data() << ":" << QString::number(m_port).toLatin1().data() << std::endl;
       removeArchive();
       exit(1);
     }
@@ -638,11 +632,11 @@ void GorgZorg::sendFileHeader(const QString &filePath)
     if (m_sendingADir)
     {
       QString aux = QLatin1String("Gorging header of dir %1").arg(m_currentFileName);
-      qout << Qt::endl << aux.remove(ctn_DIR_ESCAPE) << Qt::endl;
+      std::cout << std::endl << aux.remove(ctn_DIR_ESCAPE).toLatin1().data() << std::endl;
     }
     else
     {
-      qout << Qt::endl << QLatin1String("Gorging header of %1").arg(m_currentFileName) << Qt::endl;
+      std::cout << std::endl << "Gorging header of " << m_currentFileName.toLatin1().data() << std::endl;
     }
 
     out << qint64(0) << qint64(0) << m_currentFileName << false;
@@ -679,7 +673,6 @@ void GorgZorg::sendFileHeader(const QString &filePath)
  */
 void GorgZorg::sendDirHeader(const QString &filePath)
 {
-  QTextStream qout(stdout);
   m_fileName = filePath;
   m_outBlock.clear();
   m_sendingADir = true;
@@ -689,7 +682,8 @@ void GorgZorg::sendDirHeader(const QString &filePath)
 
   if (m_tcpClient->state() == QAbstractSocket::UnconnectedState)
   {
-    qout << Qt::endl << QLatin1String("ERROR: It seems there is no one zorging on %1:%2").arg(m_targetAddress).arg(m_port) << Qt::endl;
+    std::cout << std::endl << "ERROR: It seems there is no one zorging on " <<
+                 m_targetAddress.toLatin1().data() << ":" << QString::number(m_port).toLatin1().data() << std::endl;
     removeArchive();
     exit(1);
   }
@@ -702,7 +696,7 @@ void GorgZorg::sendDirHeader(const QString &filePath)
   m_currentFileName = m_fileName;
 
   QString aux = QLatin1String("Gorging header of dir %1").arg(m_currentFileName);
-  qout << Qt::endl << aux.remove(ctn_DIR_ESCAPE) << Qt::endl;
+  std::cout << std::endl << aux.remove(ctn_DIR_ESCAPE).toLatin1().data() << std::endl;
 
   /* This is the beggining of a directory traverse send, so let's put 'false' in the last value (m_singleTransfer)
      of the header so GorgZorg can read it as "This is not a single transfer!" */
@@ -738,8 +732,6 @@ void GorgZorg::sendDirHeader(const QString &filePath)
  */
 void GorgZorg::sendFileBody()
 {
-  QTextStream qout(stdout);
-
   m_loadSize = 4 * 1024; // The size of data sent each time
 
   if (m_sendingADir)
@@ -760,11 +752,11 @@ void GorgZorg::sendFileBody()
   if (m_sendingADir)
   {
     QString aux = QLatin1String("Gorging dir %1").arg(m_currentFileName);
-    qout << Qt::endl << aux.remove(ctn_DIR_ESCAPE) << Qt::endl;
+    std::cout << std::endl << aux.remove(ctn_DIR_ESCAPE).toLatin1().data() << std::endl;
   }
   else
   {
-    qout << Qt::endl << QLatin1String("Gorging %1").arg(m_currentFileName) << Qt::endl;
+    std::cout << std::endl << "Gorging " << m_currentFileName.toLatin1().data() << std::endl;
   }
 
   m_byteToWrite += m_outBlock.size();
@@ -778,7 +770,6 @@ void GorgZorg::sendFileBody()
  */
 void GorgZorg::send()
 {
-  QTextStream qout(stdout);
   m_loadSize = 4 * 1024; // The size of data sent each time
 
   if (m_sendingADir)
@@ -799,11 +790,11 @@ void GorgZorg::send()
   if (m_sendingADir)
   {
     QString aux = QLatin1String("Gorging dir %1").arg(m_currentFileName);
-    qout << Qt::endl << aux.remove(ctn_DIR_ESCAPE) << Qt::endl;
+    std::cout << std::endl << aux.remove(ctn_DIR_ESCAPE).toLatin1().data() << std::endl;
   }
   else
   {
-    qout << Qt::endl << QLatin1String("Gorging %1").arg(m_currentFileName) << Qt::endl;
+    std::cout << std::endl << "Gorging " << m_currentFileName.toLatin1().data() << std::endl;
   }
 
   out << qint64(0) << qint64(0) << m_currentFileName << true;
@@ -822,7 +813,6 @@ void GorgZorg::send()
  */
 void GorgZorg::goOnSend(qint64 numBytes) // Start sending file content
 {
-  QTextStream qout(stdout);
   m_byteToWrite -= numBytes; // Remaining data size
 
   if (m_sendingADir)
@@ -841,8 +831,8 @@ void GorgZorg::goOnSend(qint64 numBytes) // Start sending file content
 
   if (m_byteToWrite == 0) // Send completed
   {
-    QTextStream qout(stdout);
-    qout << QLatin1String("Gorging completed") << Qt::endl;
+    //QTextStream qout(stdout);
+    std::cout << "Gorging completed" << std::endl;
 
     //If we gorged a tared file, let's remove it!
     if (m_tarContents)
@@ -875,7 +865,6 @@ void GorgZorg::startServer(const QString &ipAddress)
   m_byteReceived = 0;
   m_server = new QTcpServer(this);
   QString ip = ipAddress;
-  QTextStream qout(stdout);
 
   if (ip.isEmpty())
   {
@@ -892,14 +881,15 @@ void GorgZorg::startServer(const QString &ipAddress)
 
   if (ip.isEmpty())
   {
-    qout << Qt::endl << QLatin1String("ERROR: No valid IP address could be found!") << Qt::endl;
+    std::cout << std::endl << "ERROR: No valid IP address could be found!" << std::endl;
     exit(1);
   }
 
   if (!m_server->listen(QHostAddress(ip), m_port))
   {
     //If we could not bind to this port...
-    qout << QString("ERROR: %1 is unavailable or port %2 is already being used in this host!").arg(ip).arg(m_port) << Qt::endl;
+    std::cout << "ERROR: " << ip.toLatin1().data() << " is unavailable or port " <<
+                 QString::number(m_port).toLatin1().data() << " is already being used in this host!" << std::endl;
     exit(1);
   }
 
@@ -911,13 +901,12 @@ void GorgZorg::startServer(const QString &ipAddress)
 
   QObject::connect(m_server, &QTcpServer::newConnection, this, &GorgZorg::acceptConnection);
 
-  qout << QLatin1String("Start zorging on %1:%2...").arg(ip).arg(m_port) << Qt::endl;
+  std::cout << "Start zorging on " << ip.toLatin1().data() << ":" << QString::number(m_port).toLatin1().data() << "..." << std::endl;
 }
 
 void GorgZorg::acceptConnection()
 {
-  QTextStream qout(stdout);
-  qout << Qt::endl << QLatin1String("Connected, preparing to zorg files!") << Qt::endl;
+  std::cout << std::endl << "Connected, preparing to zorg files!" << std::endl;
 
   m_receivedSocket = m_server->nextPendingConnection();
   QObject::connect(m_receivedSocket, &QTcpSocket::readyRead, this, &GorgZorg::readClient);
@@ -928,8 +917,6 @@ void GorgZorg::acceptConnection()
  */
 void GorgZorg::readClient()
 {
-  QTextStream qout(stdout);
-
   if (m_byteReceived == 0) // just started to receive data, this data is file information
   {
     m_receivingADir = false;
@@ -947,7 +934,7 @@ void GorgZorg::readClient()
       m_totalSize = 0;
 
       //Client is saying goodbye...
-      qout << Qt::endl << QLatin1String("See you next time!") << Qt::endl << Qt::endl;
+      std::cout << std::endl << "See you next time!" << std::endl << std::endl;
 
       if (m_quitServer)
         exit(0);
@@ -1043,7 +1030,7 @@ void GorgZorg::readClient()
         }
         else if (value == 'N' || value == 'n' || value == '\n')
         {
-          qout << Qt::endl << QLatin1String("Sending CANCEL_SEND...") << Qt::endl;
+          std::cout << std::endl << "Sending CANCEL_SEND..." << std::endl;
           m_receivedSocket->write(ctn_ZORGED_CANCEL_SEND.toLatin1());
           m_receivedSocket->waitForBytesWritten(-1);
           m_byteReceived = 0;
@@ -1074,7 +1061,7 @@ void GorgZorg::readClient()
 #endif
     }
 
-    qout << Qt::endl << QLatin1String("Zorging %1").arg(m_currentFileName) << Qt::endl;
+    std::cout << std::endl << "Zorging " << m_currentFileName.toLatin1().data() << std::endl;
 
     if (m_createMasterDir)
     {
@@ -1096,7 +1083,7 @@ void GorgZorg::readClient()
       m_totalSize = 0;
 
       //Send an OK to the other side
-      qout << QLatin1String("Zorging of master directory completed") << Qt::endl;
+      std::cout << "Zorging of master directory completed" << std::endl;
       m_receivedSocket->write(ctn_ZORGED_OK.toLatin1());
       m_receivedSocket->waitForBytesWritten(-1);
 
@@ -1220,14 +1207,21 @@ void GorgZorg::readClient()
       m_newFile->flush();
     }
 
-    if (m_verbose) qout << QLatin1String("Received %1 bytes of %2").arg(QString::number(m_byteReceived)).arg(QString::number(m_totalSize)) << Qt::endl;
+    if (m_verbose)
+    {
+      std::cout << "Received " << QString::number(m_byteReceived).toLatin1().data() << " bytes of " <<
+                   QString::number(m_totalSize).toLatin1().data() << std::endl;
+    }
   }
   else // Officially read the file content
   {
     m_inBlock = m_receivedSocket->readAll();
     m_byteReceived += m_inBlock.size();
-    if (m_verbose) qout << QLatin1String("Received again %1 bytes of %2").arg(QString::number(m_byteReceived)).arg(QString::number(m_totalSize)) << Qt::endl;
-
+    if (m_verbose)
+    {
+      std::cout << "Received again " << QString::number(m_byteReceived).toLatin1().data() << " bytes of " <<
+                   QString::number(m_totalSize).toLatin1().data() << std::endl;
+    }
     if (!m_receivingADir)
     {
       m_newFile->write(m_inBlock);
@@ -1240,8 +1234,7 @@ void GorgZorg::readClient()
 
   if (m_byteReceived == m_totalSize)
   {
-    QTextStream qout(stdout);
-    qout << QLatin1String("Zorging completed") << Qt::endl;
+    std::cout << "Zorging completed" << std::endl;
     m_inBlock.clear();
 
     if (!m_receivingADir)
@@ -1271,35 +1264,34 @@ void GorgZorg::readClient()
  */
 void GorgZorg::showHelp()
 {
-  QTextStream qout(stdout);
-  qout << Qt::endl << QLatin1String("  GorgZorg, a simple CLI network file transfer tool") << Qt::endl;
-  qout << Qt::endl << QLatin1String("    -c <IP>: Set GorgZorg server IP to connect to") << Qt::endl;
-  qout << QLatin1String("    -d <path>: Set directory in which received files are saved") << Qt::endl;
-  qout << QLatin1String("    -g <pathToGorg>: Set a filename or path to gorg (send)") << Qt::endl;
-  qout << QLatin1String("    -h: Show this help") << Qt::endl;
-  qout << QLatin1String("    -p <portnumber>: Set port to connect or listen to connections (default is 10000)") << Qt::endl;
-  qout << QLatin1String("    -q: Quit zorging after transfer is complete") << Qt::endl;
-  qout << QLatin1String("    -tar: Use tar to archive contents of path") << Qt::endl;
-  qout << QLatin1String("    -v: Verbose mode. When gorging, show speed. When zorging, show bytes received") << Qt::endl;
-  qout << QLatin1String("    -y: When zorging, automatically accept any incoming file/path") << Qt::endl;
-  qout << QLatin1String("    -z [IP]: Enter Zorg mode (listen to connections). If IP is ommited, GorgZorg will guess it") << Qt::endl;
-  qout << QLatin1String("    -zip: Use gzip to compress contents of path") << Qt::endl;
+  std::cout << std::endl << "  GorgZorg, a simple CLI network file transfer tool" << std::endl;
+  std::cout << std::endl << "    -c <IP>: Set GorgZorg server IP to connect to" << std::endl;
+  std::cout << "    -d <path>: Set directory in which received files are saved" << std::endl;
+  std::cout << "    -g <pathToGorg>: Set a filename or path to gorg (send)" << std::endl;
+  std::cout << "    -h: Show this help" << std::endl;
+  std::cout << "    -p <portnumber>: Set port to connect or listen to connections (default is 10000)" << std::endl;
+  std::cout << "    -q: Quit zorging after transfer is complete" << std::endl;
+  std::cout << "    -tar: Use tar to archive contents of path" << std::endl;
+  std::cout << "    -v: Verbose mode. When gorging, show speed. When zorging, show bytes received" << std::endl;
+  std::cout << "    -y: When zorging, automatically accept any incoming file/path" << std::endl;
+  std::cout << "    -z [IP]: Enter Zorg mode (listen to connections). If IP is ommited, GorgZorg will guess it" << std::endl;
+  std::cout << "    -zip: Use gzip to compress contents of path" << std::endl;
 
-  qout << Qt::endl << QLatin1String("  Version: ") << ctn_VERSION << Qt::endl << Qt::endl;
+  std::cout << std::endl << "  Version: " << ctn_VERSION.toLatin1().data() << std::endl << std::endl;
 
-  qout << Qt::endl << QLatin1String("  Examples:") << Qt::endl;
-  qout << Qt::endl << QLatin1String("    #Send file /home/user/Projects/gorgzorg/LICENSE to IP 10.0.1.60 on port 45400") << Qt::endl;
-  qout << QLatin1String("    gorgzorg -c 10.0.1.60 -g /home/user/Projects/gorgzorg/LICENSE -p 45400") << Qt::endl;
-  qout << Qt::endl << QLatin1String("    #Send contents of Test directory to IP 192.168.1.1 on (default) port 10000") << Qt::endl;
-  qout << QLatin1String("    gorgzorg -c 192.168.1.1 -g Test") << Qt::endl;
-  qout << Qt::endl << QLatin1String("    #Send archived contents of Crucial directory to IP 172.16.20.21") << Qt::endl;
-  qout << QLatin1String("    gorgzorg -c 172.16.20.21 -g Crucial -tar") << Qt::endl;
-  qout << Qt::endl << QLatin1String("    #Send contents of filter expression in a gziped tarball to IP 192.168.0.100") << Qt::endl;
-  qout << QLatin1String("    gorgzorg -c 192.168.0.100 -g '/home/user/Documents/*.txt' -zip") << Qt::endl;
-  qout << Qt::endl << QLatin1String("    #Start a GorgZorg server on address 192.168.10.16:20000 using directory") << Qt::endl;
-  qout << QLatin1String("    #\"/home/user/gorgzorg_files\" to save received files") << Qt::endl;
-  qout << QLatin1String("    gorgzorg -p 20000 -z 192.168.10.16 -d ~/gorgzorg_files") << Qt::endl;
-  qout << Qt::endl << QLatin1String("    #Start a GorgZorg server on address 172.16.11.43 on (default) port 10000") << Qt::endl;
-  qout << QLatin1String("    #Always accept transfers and quit just after receiving one") << Qt::endl;
-  qout << QLatin1String("    gorgzorg -z 172.16.11.43 -y -q") << Qt::endl << Qt::endl;
+  std::cout << std::endl << "  Examples:" << std::endl;
+  std::cout << std::endl << "    #Send file /home/user/Projects/gorgzorg/LICENSE to IP 10.0.1.60 on port 45400" << std::endl;
+  std::cout << "    gorgzorg -c 10.0.1.60 -g /home/user/Projects/gorgzorg/LICENSE -p 45400" << std::endl;
+  std::cout << std::endl << "    #Send contents of Test directory to IP 192.168.1.1 on (default) port 10000" << std::endl;
+  std::cout << "    gorgzorg -c 192.168.1.1 -g Test" << std::endl;
+  std::cout << std::endl << "    #Send archived contents of Crucial directory to IP 172.16.20.21" << std::endl;
+  std::cout << "    gorgzorg -c 172.16.20.21 -g Crucial -tar" << std::endl;
+  std::cout << std::endl << "    #Send contents of filter expression in a gziped tarball to IP 192.168.0.100" << std::endl;
+  std::cout << "    gorgzorg -c 192.168.0.100 -g '/home/user/Documents/*.txt' -zip" << std::endl;
+  std::cout << std::endl << "    #Start a GorgZorg server on address 192.168.10.16:20000 using directory" << std::endl;
+  std::cout << "    #\"/home/user/gorgzorg_files\" to save received files" << std::endl;
+  std::cout << "    gorgzorg -p 20000 -z 192.168.10.16 -d ~/gorgzorg_files" << std::endl;
+  std::cout << std::endl << "    #Start a GorgZorg server on address 172.16.11.43 on (default) port 10000" << std::endl;
+  std::cout << "    #Always accept transfers and quit just after receiving one" << std::endl;
+  std::cout << "    gorgzorg -z 172.16.11.43 -y -q" << std::endl << std::endl;
 }
