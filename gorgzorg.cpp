@@ -375,7 +375,7 @@ QString GorgZorg::createArchive(const QString &pathToArchive)
  */
 void GorgZorg::removeArchive()
 {
-  if (QFile::exists(m_archiveFileName) &&
+  if (!m_archiveFileName.isEmpty() && QFile::exists(m_archiveFileName) &&
       (m_archiveFileName.endsWith(".tar") || m_archiveFileName.endsWith(".tar.gz") ||
       m_archiveFileName.endsWith(".7z")))
   {
@@ -555,7 +555,7 @@ void GorgZorg::connectAndSend(const QString &targetAddress, const QString &pathT
   }
 
   removeArchive();
-  //std::cout << "\n";
+  std::cout << std::endl;
   exit(0);
 }
 
