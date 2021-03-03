@@ -19,9 +19,9 @@
 */
 
 #include <QCoreApplication>
-#include <QTextStream>
 #include <QFileInfo>
 
+#include <iostream>
 #include "gorgzorg.h"
 #include "argumentlist.h"
 
@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
   QString target;
   QString pathToGorg;
   QString aux;
-  QTextStream qout(stdout);
+  //QTextStream qout(stdout);
 
   if (argList->count() == 1)
   {
@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
 
     if (port <= 0 || port > 65535)
     {
-      qout << QLatin1String("ERROR: Valid port numbers are between 1 and 65535!") << Qt::endl;
+      std::cout << "ERROR: Valid port numbers are between 1 and 65535!" << std::endl;
       exit(1);
     }
     else
@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
 
     if (!d.isDir() || !d.exists())
     {
-      qout << QLatin1String("ERROR: %1 is not a valid directory!").arg(aux) << Qt::endl;
+      std::cout << "ERROR: " << aux.toLatin1().data() << " is not a valid directory!" << std::endl;
       exit(1);
     }
 
@@ -91,13 +91,13 @@ int main(int argc, char *argv[])
     {
       if (!GorgZorg::isValidIP(aux))
       {
-        qout << QLatin1String("ERROR: Your are trying to listen on an invalid IPv4 IP!") << Qt::endl;
+        std::cout << "ERROR: Your are trying to listen on an invalid IPv4 IP!" << std::endl;
         exit(1);
       }
 
       if (!GorgZorg::isLocalIP(aux))
       {
-        qout << QLatin1String("ERROR: GorgZorg can only run on a local network!") << Qt::endl;
+        std::cout << "ERROR: GorgZorg can only run on a local network!" << std::endl;
         exit(1);
       }
     }
@@ -113,19 +113,19 @@ int main(int argc, char *argv[])
 
       if (!GorgZorg::isValidIP(aux))
       {
-        qout << QLatin1String("ERROR: Your are trying to connect to an invalid IPv4 IP!") << Qt::endl;
+        std::cout << "ERROR: Your are trying to connect to an invalid IPv4 IP!" << std::endl;
         exit(1);
       }
 
       if (!GorgZorg::isLocalIP(target))
       {
-        qout << QLatin1String("ERROR: GorgZorg can only run on a local network!") << Qt::endl;
+        std::cout << "ERROR: GorgZorg can only run on a local network!" << std::endl;
         exit(1);
       }
     }
     else
     {
-      qout << QLatin1String("ERROR: You should specify an IP to connect to!") << Qt::endl;
+      std::cout << "ERROR: You should specify an IP to connect to!" << std::endl;
       exit(1);
     }
 
@@ -146,7 +146,7 @@ int main(int argc, char *argv[])
     {
       if (aux == "." || aux == ".." || aux == "./" || aux == "../")
       {
-        qout << QLatin1String("ERROR: This path is not compatible!") << Qt::endl;
+        std::cout << "ERROR: This path is not compatible!" << std::endl;
         exit(1);
       }
 
@@ -154,7 +154,7 @@ int main(int argc, char *argv[])
     }
     else
     {
-      qout << QLatin1String("ERROR: You should specify a filename or path to gorg (send)!") << Qt::endl;
+      std::cout << "ERROR: You should specify a filename or path to gorg (send)!" << std::endl;
       exit(1);
     }
 
