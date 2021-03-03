@@ -555,7 +555,7 @@ void GorgZorg::connectAndSend(const QString &targetAddress, const QString &pathT
   }
 
   removeArchive();
-  std::cout << std::endl;
+  //std::cout << "\n";
   exit(0);
 }
 
