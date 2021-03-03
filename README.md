@@ -13,7 +13,7 @@ So, this is the tool you've been looking for.
 ```
 $git clone https://github.com/aarnt/gorgzorg
 $cd gorgzorg
-$qmake-qt6 (or qmake-qt5)
+$qmake-qt6 (or qmake-qt5 or qmake)
 $make
 ```
 
@@ -53,7 +53,7 @@ gorgzorg -c 192.168.1.1 -g Test
 #Send archived contents of Crucial directory to IP 172.16.20.21
 gorgzorg -c 172.16.20.21 -g Crucial -tar
 
-#Send contents of filter expression in a gziped tarball to IP 192.168.0.100
+#Send contents of filter expression in a gziped tarball to IP 192.168.0.100 [1]
 gorgzorg -c 192.168.0.100 -g '/home/user/Documents/*.txt' -zip
 
 #Start a GorgZorg server on address 192.168.10.16:20000 using directory 
@@ -63,4 +63,7 @@ gorgzorg -p 20000 -z 192.168.10.16 -d ~/gorgzorg_files
 #Start a GorgZorg server on address 172.16.11.43 on (default) port 10000
 #Always accept transfers and quit just after receiving one
 gorgzorg -z 172.16.11.43 -y -q
+
+
+[1] On Windows systems, you'll need 7zip installed.
 ```

@@ -1234,7 +1234,15 @@ void GorgZorg::readClient()
 
   if (m_byteReceived == m_totalSize)
   {
+    QString savedOn;
+    if (m_zorgPath.isEmpty())
+      savedOn = QDir::currentPath();
+    else
+      savedOn = m_zorgPath;
+
     std::cout << "Zorging completed" << std::endl;
+    std::cout << "File saved on \"" << savedOn.toLatin1().data() << "\"" << std::endl;
+
     m_inBlock.clear();
 
     if (!m_receivingADir)
@@ -1286,7 +1294,7 @@ void GorgZorg::showHelp()
   std::cout << "    gorgzorg -c 192.168.1.1 -g Test" << std::endl;
   std::cout << std::endl << "    #Send archived contents of Crucial directory to IP 172.16.20.21" << std::endl;
   std::cout << "    gorgzorg -c 172.16.20.21 -g Crucial -tar" << std::endl;
-  std::cout << std::endl << "    #Send contents of filter expression in a gziped tarball to IP 192.168.0.100" << std::endl;
+  std::cout << std::endl << "    #Send contents of filter expression in a gziped tarball to IP 192.168.0.100 [1]" << std::endl;
   std::cout << "    gorgzorg -c 192.168.0.100 -g '/home/user/Documents/*.txt' -zip" << std::endl;
   std::cout << std::endl << "    #Start a GorgZorg server on address 192.168.10.16:20000 using directory" << std::endl;
   std::cout << "    #\"/home/user/gorgzorg_files\" to save received files" << std::endl;
@@ -1294,4 +1302,6 @@ void GorgZorg::showHelp()
   std::cout << std::endl << "    #Start a GorgZorg server on address 172.16.11.43 on (default) port 10000" << std::endl;
   std::cout << "    #Always accept transfers and quit just after receiving one" << std::endl;
   std::cout << "    gorgzorg -z 172.16.11.43 -y -q" << std::endl << std::endl;
+  std::cout << std::endl;
+  std::cout << "[1] On Windows systems, you'll need 7zip installed." << std::endl << std::endl;
 }
