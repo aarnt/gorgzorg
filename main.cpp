@@ -29,11 +29,11 @@ int main(int argc, char *argv[])
 {
   QCoreApplication a(argc, argv);
   ArgumentList *argList = new ArgumentList(argc, argv);
+
   GorgZorg gz;
   QString target;
   QString pathToGorg;
   QString aux;
-  //QTextStream qout(stdout);
 
   if (argList->count() == 1)
   {

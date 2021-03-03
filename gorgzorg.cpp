@@ -258,8 +258,8 @@ QString GorgZorg::createArchive(const QString &pathToArchive)
     std::cout << std::endl << "Archiving " << pathToArchive.toLatin1().data();
 
   QTime time = QTime::currentTime();
-  //quint32 gen = time.minute() + time.second() + time.msec(); //QRandomGenerator::global()->generate();
-  QString random = QString::number(time.minute()) +
+  QString random = QString::number(time.hour()) +
+      QString::number(time.minute()) +
       QString::number(time.second()) +
       QString::number(time.msec());
   QString archiveFileName = QString("gorged_%1").arg(random);
