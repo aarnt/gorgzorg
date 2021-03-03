@@ -43,7 +43,6 @@
 #include <QTime>
 #include <QRegularExpression>
 #include <QElapsedTimer>
-#include <iostream>
 
 /*
  * Sleeps given ms miliseconds
@@ -262,6 +261,7 @@ QString GorgZorg::createArchive(const QString &pathToArchive)
       QString::number(time.minute()) +
       QString::number(time.second()) +
       QString::number(time.msec());
+
   QString archiveFileName = QString("gorged_%1").arg(random);
 
   QProcess p;
