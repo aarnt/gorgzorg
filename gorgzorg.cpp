@@ -262,7 +262,7 @@ QString GorgZorg::createArchive(const QString &pathToArchive)
   QString random = QString::number(time.minute()) +
       QString::number(time.second()) +
       QString::number(time.msec());
-  QString archiveFileName = QLatin1String("gorged_%1").arg(random);
+  QString archiveFileName = QString("gorged_%1").arg(random);
 
   QProcess p;
   QStringList tarParams;
@@ -631,7 +631,7 @@ void GorgZorg::sendFileHeader(const QString &filePath)
 
     if (m_sendingADir)
     {
-      QString aux = QLatin1String("Gorging header of dir %1").arg(m_currentFileName);
+      QString aux = QString("Gorging header of dir %1").arg(m_currentFileName);
       std::cout << std::endl << aux.remove(ctn_DIR_ESCAPE).toLatin1().data() << std::endl;
     }
     else
@@ -695,7 +695,7 @@ void GorgZorg::sendDirHeader(const QString &filePath)
   QDataStream out(&m_outBlock, QIODevice::WriteOnly);
   m_currentFileName = m_fileName;
 
-  QString aux = QLatin1String("Gorging header of dir %1").arg(m_currentFileName);
+  QString aux = QString("Gorging header of dir %1").arg(m_currentFileName);
   std::cout << std::endl << aux.remove(ctn_DIR_ESCAPE).toLatin1().data() << std::endl;
 
   /* This is the beggining of a directory traverse send, so let's put 'false' in the last value (m_singleTransfer)
@@ -751,7 +751,7 @@ void GorgZorg::sendFileBody()
 
   if (m_sendingADir)
   {
-    QString aux = QLatin1String("Gorging dir %1").arg(m_currentFileName);
+    QString aux = QString("Gorging dir %1").arg(m_currentFileName);
     std::cout << std::endl << aux.remove(ctn_DIR_ESCAPE).toLatin1().data() << std::endl;
   }
   else
@@ -789,7 +789,7 @@ void GorgZorg::send()
 
   if (m_sendingADir)
   {
-    QString aux = QLatin1String("Gorging dir %1").arg(m_currentFileName);
+    QString aux = QString("Gorging dir %1").arg(m_currentFileName);
     std::cout << std::endl << aux.remove(ctn_DIR_ESCAPE).toLatin1().data() << std::endl;
   }
   else
@@ -1015,9 +1015,9 @@ void GorgZorg::readClient()
         QString query;
 
         if (m_createMasterDir)
-          query = QLatin1String("\nDo you want to zorg dir %1 (y/N)? ").arg(m_currentFileName);
+          query = QString("\nDo you want to zorg dir %1 (y/N)? ").arg(m_currentFileName);
         else
-          query = QLatin1String("\nDo you want to zorg %1 with %2 (y/N)? ").arg(m_currentFileName).arg(strTotalSize);
+          query = QString("\nDo you want to zorg %1 with %2 (y/N)? ").arg(m_currentFileName).arg(strTotalSize);
 
         char value = question(query);
 
