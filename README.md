@@ -1,6 +1,6 @@
 ## GorgZorg is a simple CLI network file transfer tool
 
-Do you need to copy files or folders between Unix machines but don't want to create shares/memorize complex syntax?
+Do you need to copy files or folders between Windows/Linux/BSD machines but don't want to create shares/memorize complex syntax?
 
 So, this is the tool you've been looking for.
 
