@@ -1,23 +1,10 @@
 /*
-* This file is part of GorgZorg, a simple CLI network file transfer tool.
+* This file is part of GorgZorg, a simple multiplatform CLI network file transfer tool.
 * It was strongly inspired by the following article:
 * https://topic.alibabacloud.com/a/file-transfer-using-the-tcp-protocol-in-qt-can-be-looped-in-one-direction_8_8_10249539.html
 * Copyright (C) 2021 Alexandre Albuquerque Arnt
 *
-* This program is free software; you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation; either version 2 of the License, or
-* (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*
+* https://github.com/aarnt/gorgzorg
 */
 
 #ifndef GORGZORG_H
@@ -104,7 +91,6 @@ public:
   void startServer(const QString &ipAddress = "");
   void showHelp();
   void showVersion();
-
   static bool isValidIP(const QString &ip);
   static bool isLocalIP(const QString &ip);  
   static QString getWorkingDirectory();
