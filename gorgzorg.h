@@ -4,7 +4,11 @@
 * https://topic.alibabacloud.com/a/file-transfer-using-the-tcp-protocol-in-qt-can-be-looped-in-one-direction_8_8_10249539.html
 * Copyright (C) 2021 Alexandre Albuquerque Arnt
 *
-* https://github.com/aarnt/gorgzorg
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+*
+* Source code hosted on: https://github.com/aarnt/gorgzorg
 */
 
 #ifndef GORGZORG_H

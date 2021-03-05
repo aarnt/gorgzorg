@@ -1,8 +1,12 @@
 /*
-* This file is part of GorgZorg, a simple CLI multiplatform network file transfer tool.
+* This file is part of GorgZorg, a simple multiplatform CLI network file transfer tool.
 * Copyright (C) 2021 Alexandre Albuquerque Arnt
 *
-* https://github.com/aarnt/gorgzorg
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+*
+* Source code hosted on: https://github.com/aarnt/gorgzorg
 */
 
 #include <QCoreApplication>
