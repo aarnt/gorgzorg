@@ -1,4 +1,4 @@
-## GorgZorg is a simple CLI network file transfer tool
+## GorgZorg is a simple multiplatform CLI network file transfer tool
 
 Do you need to copy files or folders between Windows/Linux/BSD machines but don't want to create shares/memorize complex syntax?
 
@@ -36,6 +36,7 @@ $make
     -q: Quit zorging after transfer is complete
     -tar: Use tar to archive contents of path
     -v: Verbose mode. When gorging, show speed. When zorging, show bytes received
+    --version: Show version information
     -y: When zorging, automatically accept any incoming file/path
     -z [IP]: Enter Zorg mode (listen to connections). If IP is ommited, GorgZorg will guess it
     -zip: Use gzip to compress contents of path

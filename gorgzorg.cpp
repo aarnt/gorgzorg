@@ -1272,7 +1272,8 @@ void GorgZorg::readClient()
  */
 void GorgZorg::showHelp()
 {
-  std::cout << std::endl << "  GorgZorg, a simple CLI network file transfer tool" << std::endl;
+  std::cout << std::endl << "  GorgZorg, a simple multiplatform CLI network file transfer tool" << std::endl;
+
   std::cout << std::endl << "    -c <IP>: Set GorgZorg server IP to connect to" << std::endl;
   std::cout << "    -d <path>: Set directory in which received files are saved" << std::endl;
   std::cout << "    -g <pathToGorg>: Set a filename or path to gorg (send)" << std::endl;
@@ -1281,11 +1282,10 @@ void GorgZorg::showHelp()
   std::cout << "    -q: Quit zorging after transfer is complete" << std::endl;
   std::cout << "    -tar: Use tar to archive contents of path" << std::endl;
   std::cout << "    -v: Verbose mode. When gorging, show speed. When zorging, show bytes received" << std::endl;
+  std::cout << "    --version: Show version information" << std::endl;
   std::cout << "    -y: When zorging, automatically accept any incoming file/path" << std::endl;
   std::cout << "    -z [IP]: Enter Zorg mode (listen to connections). If IP is ommited, GorgZorg will guess it" << std::endl;
   std::cout << "    -zip: Use gzip to compress contents of path" << std::endl;
-
-  std::cout << std::endl << "  Version: " << ctn_VERSION.toLatin1().data() << std::endl << std::endl;
 
   std::cout << std::endl << "  Examples:" << std::endl;
   std::cout << std::endl << "    #Send file /home/user/Projects/gorgzorg/LICENSE to IP 10.0.1.60 on port 45400" << std::endl;
@@ -1304,4 +1304,12 @@ void GorgZorg::showHelp()
   std::cout << "    gorgzorg -z 172.16.11.43 -y -q" << std::endl << std::endl;
   std::cout << std::endl;
   std::cout << "[1] On Windows systems, you'll need 7zip installed." << std::endl << std::endl;
+}
+
+/*
+ * Outputs version information
+ */
+void GorgZorg::showVersion()
+{
+  std::cout << "GorgZorg version " << ctn_VERSION.toLatin1().data() << std::endl;
 }

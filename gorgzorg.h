@@ -84,12 +84,12 @@ private:
 
   QString getShell();
   QString createArchive(const QString &pathToArchive);
-
   bool prepareToSendFile(const QString &fName);
   void sendFile(const QString &filePath);
   void sendFileHeader(const QString &filePath);
   void sendDirHeader(const QString &filePath);
   void sendEndOfTransfer();
+  void removeArchive();
 
 private slots:
   void acceptConnection();
@@ -103,7 +103,7 @@ public:
   void connectAndSend(const QString &targetAddress, const QString &pathToGorg);
   void startServer(const QString &ipAddress = "");
   void showHelp();
-  void removeArchive();
+  void showVersion();
 
   static bool isValidIP(const QString &ip);
   static bool isLocalIP(const QString &ip);  

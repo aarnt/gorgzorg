@@ -29,7 +29,6 @@ int main(int argc, char *argv[])
 {
   QCoreApplication a(argc, argv);
   ArgumentList *argList = new ArgumentList(argc, argv);
-
   GorgZorg gz;
   QString target;
   QString pathToGorg;
@@ -44,6 +43,11 @@ int main(int argc, char *argv[])
   if (argList->getSwitch("-h"))
   {
     gz.showHelp();
+    exit(0);
+  }
+  else if (argList->getSwitch("--version"))
+  {
+    gz.showVersion();
     exit(0);
   }
 
@@ -81,7 +85,7 @@ int main(int argc, char *argv[])
     gz.setZorgPath(aux);
   }
 
-  if (argList->getSwitch("-v")) gz.setVerbose();
+  if (argList->getSwitch("-v")) gz.setVerbose();   
 
   if (argList->contains(QLatin1String("-z")))
   {
