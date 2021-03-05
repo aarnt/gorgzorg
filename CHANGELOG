@@ -3,6 +3,7 @@
   Added an AppImage version.
   Added "-d <path>" param so users can set the directory in which 
     received files are saved.
+  Added support for '*.string' gorging of files.
   Added Qt6 support.
 
 0.2.0 (2021-02-17)
