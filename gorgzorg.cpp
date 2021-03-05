@@ -1312,4 +1312,6 @@ void GorgZorg::showHelp()
 void GorgZorg::showVersion()
 {
   std::cout << "GorgZorg version " << ctn_VERSION.toLatin1().data() << std::endl;
+  std::cout << "  Licensed under the terms of GNU LGPL v2.1" << std::endl;
+  std::cout << "  (c) Alexandre Arnt - https://tintaescura.com" << std::endl;
 }
