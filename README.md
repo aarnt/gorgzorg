@@ -4,7 +4,7 @@ Do you need to copy files or folders between Windows/Linux/BSD machines but don'
 
 So, this is the tool you've been looking for.
 
-### How do you get GorgZorg
+### How do you install GorgZorg
 
 If you own a 64 bit Windows or a 64 bit Linux computer, you can download latest binaries from [here](https://github.com/aarnt/gorgzorg/releases/latest).
 Otherwise, keep reading, as you'll have to compile the source code.
@@ -20,6 +20,7 @@ $git clone https://github.com/aarnt/gorgzorg
 $cd gorgzorg
 $qmake-qt6 (or qmake-qt5 or qmake)
 $make
+$copy generated gorgzorg binary to your /usr/bin (Linux), /usr/local/bin (BSD) or any other path (Windows)
 ```
 
 ### How to compile GorgZorg using CMake
