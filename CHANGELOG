@@ -1,3 +1,7 @@
+0.3.1
+  Added "-bs <number>" param to set the block size value (in kilobytes).
+    Default bs size is 4.
+
 0.3.0
   Added support for 64bit Windows (needs 7zip for all features).
   Added an AppImage version.

@@ -21,7 +21,9 @@ class QTcpServer;
 class QFile;
 class QElapsedTimer;
 
-const QString ctn_VERSION = QLatin1String("0.3.0");
+const int ctn_BLOCK_SIZE = 4;
+
+const QString ctn_VERSION = QLatin1String("0.3.1(dev)");
 const QString ctn_DIR_ESCAPE = QLatin1String("<^dir$>:");
 const QString ctn_ZORGED_OK = QLatin1String("Z_OK");
 const QString ctn_ZORGED_OK_SEND = QLatin1String("Z_OK_SEND");
@@ -70,6 +72,7 @@ private:
   qint64 m_totalSize;       //Total file size
   qint64 m_totalSent;       //Total bytes sent
 
+  int m_block;
   int m_port;
   int m_sendTimes;          //Used to mark whether to send for the first time, after the first connection signal is triggered, followed by manually calling
 
@@ -100,6 +103,7 @@ public:
   static QString getWorkingDirectory();
 
   //Command line passing params
+  inline void setBlockSize(int block) { m_block = block; }
   inline void setPort(int port) { m_port = port; }
   inline void setTarContents() { m_tarContents = true; }
   inline void setZipContents() { m_zipContents = true; }

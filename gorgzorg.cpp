@@ -127,6 +127,7 @@ GorgZorg::GorgZorg()
   m_sendTimes = 0;
   m_totalSent = 0;
   m_targetAddress = "";
+  m_block = ctn_BLOCK_SIZE;
   m_port = 10000;
   m_elapsedTime = new QElapsedTimer();
   m_alwaysAccept = false;
@@ -563,7 +564,7 @@ void GorgZorg::sendEndOfTransfer()
     return;
   }
 
-  m_loadSize = 4 * 1024; // The size of data sent each time
+  m_loadSize = m_block * 1024; // The size of data sent each time
   m_byteToWrite = 0;
   m_totalSize = 0;
   m_totalSent += m_totalSize;
@@ -603,7 +604,7 @@ void GorgZorg::sendFileHeader(const QString &filePath)
       exit(1);
     }
 
-    m_loadSize = 4 * 1024; // The size of data sent each time
+    m_loadSize = m_block * 1024; // The size of data sent each time
 
     if (m_sendingADir)
     {
@@ -679,7 +680,7 @@ void GorgZorg::sendDirHeader(const QString &filePath)
     exit(1);
   }
 
-  m_loadSize = 4 * 1024; // The size of data sent each time
+  m_loadSize = m_block * 1024; // The size of data sent each time
   m_byteToWrite = 0;
   m_totalSize = 0;
 
@@ -723,7 +724,7 @@ void GorgZorg::sendDirHeader(const QString &filePath)
  */
 void GorgZorg::sendFileBody()
 {
-  m_loadSize = 4 * 1024; // The size of data sent each time
+  m_loadSize = m_block * 1024; // The size of data sent each time
 
   if (m_sendingADir)
   {
@@ -761,7 +762,7 @@ void GorgZorg::sendFileBody()
  */
 void GorgZorg::send()
 {
-  m_loadSize = 4 * 1024; // The size of data sent each time
+  m_loadSize = m_block * 1024; // The size of data sent each time
 
   if (m_sendingADir)
   {
@@ -1264,7 +1265,8 @@ void GorgZorg::readClient()
 void GorgZorg::showHelp()
 {
   std::cout << std::endl << "  GorgZorg, a simple multiplatform CLI network file transfer tool" << std::endl;
-  std::cout << std::endl << "    -c <IP>: Set GorgZorg server IP to connect to" << std::endl;
+  std::cout << std::endl << "    -bs <number>: Set the block size value (in kilobytes) when sending data (default is 4)" << std::endl;
+  std::cout << "    -c <IP>: Set GorgZorg server IP to connect to" << std::endl;
   std::cout << "    -d <path>: Set directory in which received files are saved" << std::endl;
   std::cout << "    -g <pathToGorg>: Set a filename or path to gorg (send)" << std::endl;
   std::cout << "    -h: Show this help" << std::endl;

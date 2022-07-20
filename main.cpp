@@ -43,6 +43,21 @@ int main(int argc, char *argv[])
     exit(0);
   }
 
+  aux = argList->getSwitchArg(QLatin1String("-bs"));
+  if (!aux.isEmpty())
+  {
+    bool ok;
+    int block = aux.toInt(&ok);
+    if (block > 0)
+    {
+      gz.setBlockSize(block);
+    }
+    else
+    {
+      gz.setBlockSize(4);
+    }
+  }
+
   aux = argList->getSwitchArg(QLatin1String("-p"));
   if (!aux.isEmpty())
   {
