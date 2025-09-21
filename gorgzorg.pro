@@ -8,7 +8,7 @@ INCLUDEPATH += .
 QT += core network
 QT -= gui
 CONFIG += cmdline
-QMAKE_CXXFLAGS += -std=c++11
+QMAKE_CXXFLAGS += -std=c++17
 
 # You can make your code fail to compile if you use deprecated APIs.
 # In order to do so, uncomment the following line.
